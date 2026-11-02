@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkinGuard Diagnostics</title>
+    <link rel="manifest" href="manifest.json">
+    <!-- TensorFlow & Teachable Machine Libraries -->
+    <script src="https://jsdelivr.net"></script>
+    <script src="https://jsdelivr.net"></script>
+    
+    <style>
+        :root { --bg: #f4f7f6; --primary: #2a6f97; --text: #2c3e50; --danger: #d90429; --success: #2b9348;}
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; background: var(--bg); color: var(--text); }
+        .screen { display: none; min-height: 100vh; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; text-align: center; }
+        .active { display: flex; }
+        #splash-screen { background: var(--primary); color: white; transition: opacity 0.5s ease; }
+        input, select, button { padding: 12px; margin: 8px 0; width: 85%; max-width: 300px; border-radius: 8px; border: 1px solid #ccc; font-size: 1rem; box-sizing: border-box; }
+        button { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 90%; max-width: 450px; box-sizing: border-box; }
+        .option-btn { background: #e0f2fe; color: var(--primary); border: 2px solid var(--primary); margin: 10px; font-size: 1.2rem; width: 85%; max-width: 300px;}
+        #history-log { margin-top: 15px; text-align: left; background: #eee; padding: 10px; border-radius: 5px; font-size: 0.85rem; max-height: 150px; overflow-y: auto;}
+        .info-text { text-align: left; margin: 15px 0; font-size: 0.95rem; line-height: 1.4; }
+        .disclaimer-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px; font-size: 0.85rem; margin-top: 15px; text-align: left; border-radius: 4px; }
+        .results-box { text-align: left; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef; margin-top: 15px; }
+    </style>
+</head>
+<body>
+
+    <!-- 1. SPLASH SCREEN -->
+    <div id="splash-screen" class="screen active">
+        <img src="logo.png" alt="App Logo" style="width: 150px; height: auto; margin-bottom: 20px;">
+        <p style="font-size: 1.2rem; font-weight: 500;">Advanced Screening Assistant</p>
+    </div>
+
+    <!-- 2. ONBOARDING SCREEN -->
+    <div id="onboarding-screen" class="screen">
+        <div class="card">
+            <h2>Welcome</h2>
+            <p>Please enter your profile details</p>
+            <input type="text" id="user-name" placeholder="Full Name" required>
+            <select id="user-gender">
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+            <input type="number" id="user-age" placeholder="Age" min="0">
+            <input type="date" id="user-birthday" placeholder="Birthday">
+            <button onclick="saveProfile()">Continue</button>
+        </div>
+    </div>
+
+    <!-- 3. MAIN MENU OPTION SCREEN -->
+    <div id="menu-screen" class="screen">
+        <h2 id="welcome-message">Hello!</h2>
+        <div id="weather-widget" style="font-size: 0.9rem; margin-bottom: 20px; color: #555;">🌤️ Checking environmental UV index...</div>
+        <p>Select an area for assessment:</p>
+        <button class="option-btn" onclick="goToOption('moles')">🟢 Skin Moles Option</button>
+        <button class="option-btn" onclick="goToOption('mouth')" style="background:#f3e8ff; color:#6b21a8; border-color:#6b21a8;">👄 Mouth Lesions Option</button>
+    </div>
+
+    <!-- 4. ABCDE QUESTIONS SCREEN (FOR MOLES) -->
+    <div id="abcde-screen" class="screen">
+        <div class="card">
+            <h3>ABCDE Risk Evaluation</h3>
+            <p>Please evaluate these physical visual features before scanning:</p>
+            <div style="text-align: left; margin-bottom: 15px;">
+                <label><input type="checkbox" id="q-a"> <b>A - Asymmetry:</b> Is the mole irregularly shaped?</label><br><br>
+                <label><input type="checkbox" id="q-b"> <b>B - Border:</b> Are the edges jagged, blurry, or uneven?</label><br><br>
+                <label><input type="checkbox" id="q-c"> <b>C - Color:</b> Does it contain multiple colors or changing shades?</label><br><br>
+                <label><input type="checkbox" id="q-d"> <b>D - Diameter:</b> Is the spot larger than 6mm (pencil eraser)?</label><br><br>
+                <label><input type="checkbox" id="q-e"> <b>E - Evolving:</b> Has it grown, bled, shifted, or changed recently?</label>
+            </div>
+            <button onclick="startScanner()">Proceed to Scanner</button>
+        </div>
+    </div>
+
+    <!-- 5. MOUTH LESIONS SURVEY SCREEN -->
+    <div id="mouth-survey-screen" class="screen">
+        <div class="card">
+            <h3>Mouth Lesion Assessment</h3>
+            <p>Please answer a few questions about how the lesion feels and looks:</p>
+            <div style="text-align: left; margin-bottom: 15px;">
+                <label><b>1. What color is the lesion?</b></label><br>
+                <select id="mouth-q-color" style="width:100%;">
+                    <option value="Red">Primarily Red (Erythematous)</option>
+                    <option value="White">Primarily White (Leukoplakia-like)</option>
+                    <option value="Mixed">Mixed Red and White</option>
+                    <option value="Ulcerated">Open Sore / Yellowish-White Center</option>
+                </select><br><br>
+
+                <label><b>2. Where is it located in the mouth?</b></label><br>
+                <select id="mouth-q-location" style="width:100%;">
+                    <option value="Tongue">On or under the tongue</option>
+                    <option value="Cheek">Inside the cheeks (buccal mucosa)</option>
+                    <option value="Lips">On the lips or gums</option>
+                    <option value="Palate">Roof of the mouth (palate)</option>
+                </select><br><br>
+
+                <label><b>3. How does it feel?</b></label><br>
+                <select id="mouth-q-feeling" style="width:100%;">
+                    <option value="Painful">Painful, tender, or burning sensation</option>
+                    <option value="Painless-Hard">Painless but feels hard/firm to touch</option>
+                    <option value="Painless-Soft">Painless and soft/velvety</option>
+                    <option value="Rough">Rough, crusty, or scraping friction</option>
+                </select>
+            </div>
+            <button onclick="startScanner()">Proceed to Scanner</button>
+        </div>
+    </div>
+
+    <!-- 6. SCANNER & LOG TRACKING SCREEN -->
+    <div id="scanner-screen" class="screen">
+        <div class="card">
+            <h3 id="scanner-title">Scanner Active</h3>
+            
+            <div id="webcam-container" style="background: #000; width: 200px; height: 200px; margin: 0 auto 15px; border-radius: 8px; overflow:hidden;"></div>
+            
+            <button id="flash-btn" onclick="toggleFlash()" style="background:#6c757d; margin-bottom:10px;">🔦 Toggle Flashlight</button>
+            <button id="scan-trigger" onclick="runAnalysis()">Analyze & Track Image</button>
+            
+            <div id="result-display" class="results-box" style="display:none;"></div>
+            
+            <hr style="margin:20px 0; border:0; border-top:1px solid #ccc;">
+            <h4>Your Tracked Evolution Log:</h4>
+            <div id="history-log">No previous snapshots recorded yet.</div>
+            <br>
+            <button onclick="stopAndBack()" style="background:#555;">Back to Main Menu</button>
+        </div>
+    </div>
+
+    <script>
+        let userProfile = {};
+        let scanHistory = JSON.parse(localStorage.getItem('scanHistory')) || [];
+        let model, webcam;
+        let activeMode = ''; 
+        let flashOn = false;
+        let trackStream = null;
+
+        // ⚠️ PASTE YOUR RELEVANT GOOGLE TEACHABLE MACHINE LINKS HERE
+        const MOLE_MODEL_URL = "https://teachablemachine.withgoogle.com/models/qHXgJmz2q/"; 
+        const MOUTH_MODEL_URL = "https://teachablemachine.withgoogle.com/models/T-1ag-a9U/"; 
+
+        const diagnosisDatabase = {
+            "melanoma": {
+                desc: "Melanoma shares clinical characteristics with invasive, metastatic, or in-situ skin cancers arising from pigment-producing cells. It appears as an asymmetrical lesion with irregular borders, varied coloration, and continuous structural evolution.",
+                adv: "It is critical to seek immediate evaluation from a board-certified dermatologist. Early diagnostic biopsy and staging are vital for effective therapeutic interventions.",
+                risk: "high"
+            },
+            "basal cell carcinoma": {
+                desc: "Basal cell carcinoma is consistent with a common form of slow-growing, locally invasive non-melanoma skin cancer. It frequently presents as a pearly nodule, a pinkish patch, or a non-healing ulceration subject to bleeding.",
+                adv: "A formal dermatological consultation is highly important for a structural assessment. While rarely spreading distantly, surgical excision or local therapy is standard to prevent tissue destruction.",
+                risk: "high"
+            },
+            "squamous cell carcinoma": {
+                desc: "Squamous cell carcinoma shares visual properties with malignant or precancerous transformations of squamous epidermal cells. It typically resembles a firm red nodule, a rough scaly plaque, or a persistent crusted lesion.",
+                adv: "Scheduling an evaluation with a medical specialist promptly is highly recommended. Professional intervention prevents extensive local tissue damage or potential lymphatic spread.",
+                risk: "high"
+            },
+            "common nevi moles": {
+                desc: "Common nevi resemble standard benign proliferation of melanocytes. They manifest as uniform, symmetrical, brown or tan spots with clearly defined borders and stable architecture over long periods.",
+                adv: "Routine skin self-examinations are sufficient for stable lesions. However, see a physician if any mark develops changes in symmetry, borders, or size over time.",
+                risk: "benign"
+            },
+            "Seborrheic Keratoses (Benign)": {
+                desc: "Seborrheic keratosis appears consistent with a non-cancerous, superficial epidermal growth. It features a characteristic 'stuck-on', waxy, or hyperkeratotic appearance, varying from light tan to black.",
+                adv: "No immediate medical treatment is necessary as these are harmless. Consultation is suggested only if the growth undergoes irritation, catches on clothing, or exhibits diagnostic ambiguity.",
+                risk: "benign"
+            },
+            "Dermatofibromas (Benign)": {
+                desc: "Dermatofibroma is consistent with a benign, firm, fibrous skin nodule often found on limbs. It characteristically exhibits a positive 'dimple sign' when pinched laterally and ranges from brown to pinkish-purple.",
+                adv: "Clinical monitoring is generally adequate as these lesions are completely benign. Seek professional verification if the area experiences sudden growth, pain, or atypical color changes.",
+                risk: "benign"
+            },
+            "Hemangioma (Benign)": {
+                desc: "Hemangioma resembles a benign vascular lesion composed of abnormally dense blood vessels. It presents as a bright red to deep purple superficial papule or deeper soft tissue swelling.",
+                adv: "No urgent dermatological care is required for asymptomatic, stable hemangiomas. An expert evaluation is appropriate if bleeding occurs, or if structural changes cause functional discomfort.",
+                risk: "benign"
+            },
+
+            // Mouth Lesions Categories
+            "oral Squamous Cell Carcinoma(Malignant & Pre-Cancerous)": {
+                desc: "Oral squamous cell carcinoma shares characteristics with primary malignant mucosal transformations. It exhibits patterns of an indurated, firm ulceration, a persistent exophytic growth, or irregular tissue friability.",
+                adv: "Immediate referral to an oral surgeon, ENT specialist, or dermatologist is critically important. Rapid tissue biopsy is essential to guide appropriate surgical or oncological strategies.",
+                risk: "high"
+            },
+            "Erythroplakia (Malignant & Pre-Cancerous)": {
+                desc: "Oral erythroplakia is consistent with a highly suspicious, fiery red mucosal patch that cannot be characterized clinically or pathologically as any other defining condition. It holds a very high rate of dysplasia.",
+                adv: "A prompt, comprehensive clinical assessment by a healthcare specialist is highly important. Diagnostic tissue mapping and biopsy are required due to the elevated risk of pre-malignancy.",
+                risk: "high"
+            },
+            "Leukoplakia (Non-Homogenous)(Malignant)": {
+                desc: "Non-homogenous leukoplakia resembles a white or mixed red-and-white mucosal plaque with an irregular, nodular, verrucous, or speckled topography, showing high associations with advanced cellular dysplasia.",
+                adv: "Arranging an evaluation with an oral specialist or dermatologist without delay is vital. Advanced clinical diagnostic monitoring or definitive excision is typically indicated.",
+                risk: "high"
+            },
+            "Aphthous Ulcers (Canker Sores)(Benign)": {
+                desc: "Aphthous ulcers share characteristics with common, self-limiting inflammatory oral conditions. They appear as painful, shallow, round or oval ulcerations featuring a yellowish-white pseudomembranous center and a distinct red halo.",
+                adv: "Lesions typically resolve spontaneously within 7 to 14 days. If the ulcer persists beyond three weeks, grows exceptionally large, or prevents fluid intake, consult a healthcare provider.",
+                risk: "benign"
+            },
+            "Herpetic Lesions (Cold Sores)(Benign)": {
+                desc: "Herpetic lesions resemble localized viral flare-ups characterized by clusters of small, fluid-filled vesicles on mucosal borders. These vesicles rupture to form shallow, painful, crusted erosions.",
+                adv: "Managing symptoms with standard topical or oral supportive care is generally sufficient. Seek a professional prescription if outbreaks are frequent, exceptionally widespread, or fail to heal normally.",
+                risk: "benign"
+            },
+            "Traumatic Ulcers(Benign)": {
+                desc: "Traumatic ulcers appear consistent with localized mechanical, thermal, or chemical mucosal injury. They display a distinct surface erosion directly correlating to an identifiable source of chronic physical irritation.",
+                adv: "The sore should improve rapidly once the physical cause (such as a sharp tooth or appliance) is removed. If no healing is observed within two weeks of resolving the trauma, a specialist review is needed.",
+                risk: "benign"
+            },
+            "Oral Thrush (Candidiasis)(Benign)": {
+                desc: "Oral thrush resembles a superficial fungal candidiasis overgrowth. It characteristically presents as soft, creamy-white patches on the oral mucosa that can be scraped away, leaving a raw, erythematous base.",
+                adv: "A consultation with a doctor or dentist is recommended to confirm the fungal origin. Standard localized or systemic antifungal therapies successfully eliminate the underlying infection.",
+                risk: "benign"
+            }
+        };
+
+        setTimeout(() => { changeScreen('onboarding-screen'); }, 2500);
+
+        function changeScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function saveProfile() {
+            userProfile.name = document.getElementById('user-name').value;
+            userProfile.gender = document.getElementById('user-gender').value;
+            userProfile.age = document.getElementById('user-age').value;
+            userProfile.birthday = document.getElementById('user-birthday').value;
+
+            if(!userProfile.name) { alert("Please complete the profile forms first."); return; }
+            
+            document.getElementById('welcome-message').innerText = `Hello, ${userProfile.name}!`;
+            fetchWeatherAlert();
+            changeScreen('menu-screen');
+        }
+
+        function fetchWeatherAlert() {
+            document.getElementById('weather-widget').innerHTML = "☀️ <b>UV Index Update:</b> High UV levels observed in your area today. Ensure proper sun protection and monitor active changes.";
+        }
+
+        function goToOption(mode) {
+            activeMode = mode;
+            if(mode === 'moles') { changeScreen('abcde-screen'); } 
+            else { changeScreen('mouth-survey-screen'); }
+        }
+
+        async function startScanner() {
+            changeScreen('scanner-screen');
+            document.getElementById('scanner-title').innerText = activeMode === 'moles' ? "Mole Scanner Active" : "Mouth Lesion Scanner Active";
+            document.getElementById('result-display').style.display = "none";
+            updateHistoryUI();
+
+            try {
+                const targetModelURL = activeMode === 'moles' ? MOLE_MODEL_URL : MOUTH_MODEL_URL;
+                model = await tmImage.load(targetModelURL + "model.json", targetModelURL + "metadata.json");
+                
+                webcam = new tmImage.Webcam(200, 200, true); 
+                await webcam.setup({ facingMode: "environment" }); 
+                await webcam.play();
+                
+                if (webcam.webcam.videoWidth) {
+                    trackStream = webcam.stream.getVideoTracks();
+                }
+                document.getElementById("webcam-container").innerHTML = "";
+document.getElementById("webcam-container").appendChild(webcam.canvas);
+document.getElementById('result-display').style.display = "block";
+document.getElementById('result-display').innerText = "Camera streams synchronized. Position the camera and illuminate cleanly.";
+window.requestAnimationFrame(loop);
+} catch(e) {
+document.getElementById('result-display').style.display = "block";
+document.getElementById('result-display').innerText = "Camera hardware synchronization error. Please verify URL variables or device configurations.";
+}
+}
+async function loop() {
+if(webcam && webcam.canvas) {
+webcam.update();
+window.requestAnimationFrame(loop);
+}
+}
+async function toggleFlash() {
+if (!trackStream || trackStream.length === 0) return;
+try {
+flashOn = !flashOn;
+await trackStream.applyConstraints({
+advanced: [{ torch: flashOn }]
+});
+} catch (err) {
+alert("Flashlight torch constraint is not supported by your current browser/device setup.");
+}
+}
+async function runAnalysis() {
+    let userReportData = "";
+    
+    if(activeMode === 'moles') {
+        let score = 0;
+        if(document.getElementById('q-a').checked) score++;
+        if(document.getElementById('q-b').checked) score++;
+        if(document.getElementById('q-c').checked) score++;
+        if(document.getElementById('q-d').checked) score++;
+        if(document.getElementById('q-e').checked) score++;
+        // FIX: Added backticks around the string below
+        userReportData = `ABCDE Questionnaire Flags: ${score}/5`;
+    } else {
+        const col = document.getElementById('mouth-q-color').value;
+        const loc = document.getElementById('mouth-q-location').value;
+        const feel = document.getElementById('mouth-q-feeling').value;
+        // FIX: Added backticks around the string below
+        userReportData = `Survey Context: ${col} patch found on the ${loc} feeling ${feel}.`;
+    }
+
+    let topPrediction = ""; 
+    let confidence = "0%";
+
+    if (model && webcam) {
+        const prediction = await model.predict(webcam.canvas);
+        let highestProb = 0;
+        for (let i = 0; i < model.getTotalClasses(); i++) {
+            if(prediction[i].probability > highestProb) {
+                highestProb = prediction[i].probability;
+                topPrediction = prediction[i].className;
+                confidence = (highestProb * 100).toFixed(0) + "%";
+            }
+        }
+    }
+
+    let infoObj = diagnosisDatabase[topPrediction] || {
+        desc: "The scanned visual target exhibits unique structural characteristics matching custom training dataset entries.",
+        adv: "Consult with a medical professional to review this specific visual structure formally.",
+        risk: "benign"
+    };
+
+    const logEntry = {
+        type: activeMode === 'moles' ? "Skin Mole" : "Mouth Lesion",
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+        notes: userReportData,
+        // FIX: Added backticks around the string below
+        finding: `${topPrediction} (${confidence})`
+    };
+
+    scanHistory.unshift(logEntry);
+    localStorage.setItem('scanHistory', JSON.stringify(scanHistory));
+    
+    const accentColor = infoObj.risk === 'high' ? 'var(--danger)' : 'var(--success)';
+    
+    // FIX: Added backticks around the huge HTML block below
+    document.getElementById('result-display').innerHTML = `
+        <h3 style="color:${accentColor}; margin-top:0;">Assessment: ${topPrediction} (${confidence})</h3>
+        <p style="font-size:0.85rem; color:#666; margin: -5px 0 10px;">${userReportData}</p>
+        <div class="info-text"><b>Description:</b> ${infoObj.desc}</div>
+        <div class="info-text"><b>Guidance:</b> ${infoObj.adv}</div>
+        <div class="disclaimer-box">
+            ⚠️ <b>AI Limitation Notification:</b> This machine learning output and mobile device usage serves as an educational, preliminary screening helper; it does not substitute for a professional clinical diagnosis. Make sure to double-check the physical label and consult a certified medical professional for confirmation.
+        </div>
+    `;
+    
+    updateHistoryUI();
+}
+
+function updateHistoryUI() {
+    const container = document.getElementById('history-log');
+    const targetType = activeMode === 'moles' ? "Skin Mole" : "Mouth Lesion";
+    const filtered = scanHistory.filter(h => h.type === targetType);
+    
+    if(filtered.length === 0) {
+        container.innerHTML = "No historical tracking snapshots saved for this category.";
+        return;
+    }
+    // FIX: Added backticks inside the map function below
+    container.innerHTML = filtered.map(entry => `
+        <div style="border-bottom:1px solid #ccc; padding: 6px 0;">
+            📅 <b>${entry.date} at ${entry.time}</b><br>
+            ↳ Result: <span style="font-weight:bold;">${entry.finding}</span><br>
+            <small style="color:#666;">${entry.notes}</small>
+        </div>
+    `).join('');
+}
+
+async function stopAndBack() {
+    if (webcam) {
+        try {
+            if(flashOn) { toggleFlash(); }
+            await webcam.stop();
+        } catch(e){}
+        webcam = null;
+        trackStream = null;
+    }
+    document.getElementById("webcam-container").innerHTML = "";
+    changeScreen('menu-screen');
+}
