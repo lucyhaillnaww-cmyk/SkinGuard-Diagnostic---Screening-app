@@ -6,8 +6,8 @@
     <title>SkinGuard Diagnostics</title>
     <link rel="manifest" href="manifest.json">
         <!-- TensorFlow & Teachable Machine Libraries -->
-    <script src="https://jsdelivr.net"></script>
-    <script src="https://jsdelivr.net"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>  
     
     <style>
         :root { --bg: #f4f7f6; --primary: #2a6f97; --text: #2c3e50; --danger: #d90429; --success: #2b9348;}
@@ -138,7 +138,6 @@
         let flashOn = false;
         let trackStream = null;
 
-        // ⚠️ PASTE YOUR RELEVANT GOOGLE TEACHABLE MACHINE LINKS HERE
         const MOLE_MODEL_URL = "https://teachablemachine.withgoogle.com/models/qHXgJmz2q/"; 
         const MOUTH_MODEL_URL = "https://teachablemachine.withgoogle.com/models/T-1ag-a9U/"; 
 
@@ -265,129 +264,129 @@
                     trackStream = webcam.stream.getVideoTracks();
                 }
                 document.getElementById("webcam-container").innerHTML = "";
-document.getElementById("webcam-container").appendChild(webcam.canvas);
-document.getElementById('result-display').style.display = "block";
-document.getElementById('result-display').innerText = "Camera streams synchronized. Position the camera and illuminate cleanly.";
-window.requestAnimationFrame(loop);
-} catch(e) {
-document.getElementById('result-display').style.display = "block";
-document.getElementById('result-display').innerText = "Camera hardware synchronization error. Please verify URL variables or device configurations.";
-}
-}
-async function loop() {
-if(webcam && webcam.canvas) {
-webcam.update();
-window.requestAnimationFrame(loop);
-}
-}
-async function toggleFlash() {
-if (!trackStream || trackStream.length === 0) return;
-try {
-flashOn = !flashOn;
-await trackStream.applyConstraints({
-advanced: [{ torch: flashOn }]
-});
-} catch (err) {
-alert("Flashlight torch constraint is not supported by your current browser/device setup.");
-}
-}
-async function runAnalysis() {
-    let userReportData = "";
-    
-    if(activeMode === 'moles') {
-        let score = 0;
-        if(document.getElementById('q-a').checked) score++;
-        if(document.getElementById('q-b').checked) score++;
-        if(document.getElementById('q-c').checked) score++;
-        if(document.getElementById('q-d').checked) score++;
-        if(document.getElementById('q-e').checked) score++;
-        // FIX: Added backticks around the string below
-        userReportData = `ABCDE Questionnaire Flags: ${score}/5`;
-    } else {
-        const col = document.getElementById('mouth-q-color').value;
-        const loc = document.getElementById('mouth-q-location').value;
-        const feel = document.getElementById('mouth-q-feeling').value;
-        // FIX: Added backticks around the string below
-        userReportData = `Survey Context: ${col} patch found on the ${loc} feeling ${feel}.`;
-    }
-
-    let topPrediction = ""; 
-    let confidence = "0%";
-
-    if (model && webcam) {
-        const prediction = await model.predict(webcam.canvas);
-        let highestProb = 0;
-        for (let i = 0; i < model.getTotalClasses(); i++) {
-            if(prediction[i].probability > highestProb) {
-                highestProb = prediction[i].probability;
-                topPrediction = prediction[i].className;
-                confidence = (highestProb * 100).toFixed(0) + "%";
+                document.getElementById("webcam-container").appendChild(webcam.canvas);
+                document.getElementById('result-display').style.display = "block";
+                document.getElementById('result-display').innerText = "Camera streams synchronized. Position the camera and illuminate cleanly.";
+                window.requestAnimationFrame(loop);
+            } catch(e) {
+                document.getElementById('result-display').style.display = "block";
+                document.getElementById('result-display').innerText = "Camera hardware synchronization error. Please verify URL variables or device configurations.";
             }
         }
-    }
 
-    let infoObj = diagnosisDatabase[topPrediction] || {
-        desc: "The scanned visual target exhibits unique structural characteristics matching custom training dataset entries.",
-        adv: "Consult with a medical professional to review this specific visual structure formally.",
-        risk: "benign"
-    };
+        async function loop() {
+            if(webcam && webcam.canvas) {
+                webcam.update();
+                window.requestAnimationFrame(loop);
+            }
+        }
 
-    const logEntry = {
-        type: activeMode === 'moles' ? "Skin Mole" : "Mouth Lesion",
-        date: new Date().toLocaleDateString(),
-        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-        notes: userReportData,
-        // FIX: Added backticks around the string below
-        finding: `${topPrediction} (${confidence})`
-    };
+        async function toggleFlash() {
+            if (!trackStream || trackStream.length === 0) return;
+            try {
+                flashOn = !flashOn;
+                await trackStream[0].applyConstraints({
+                    advanced: [{ torch: flashOn }]
+                });
+            } catch (err) {
+                alert("Flashlight torch constraint is not supported by your current browser/device setup.");
+            }
+        }
 
-    scanHistory.unshift(logEntry);
-    localStorage.setItem('scanHistory', JSON.stringify(scanHistory));
-    
-    const accentColor = infoObj.risk === 'high' ? 'var(--danger)' : 'var(--success)';
-    
-    // FIX: Added backticks around the huge HTML block below
-    document.getElementById('result-display').innerHTML = `
-        <h3 style="color:${accentColor}; margin-top:0;">Assessment: ${topPrediction} (${confidence})</h3>
-        <p style="font-size:0.85rem; color:#666; margin: -5px 0 10px;">${userReportData}</p>
-        <div class="info-text"><b>Description:</b> ${infoObj.desc}</div>
-        <div class="info-text"><b>Guidance:</b> ${infoObj.adv}</div>
-        <div class="disclaimer-box">
-            ⚠️ <b>AI Limitation Notification:</b> This machine learning output and mobile device usage serves as an educational, preliminary screening helper; it does not substitute for a professional clinical diagnosis. Make sure to double-check the physical label and consult a certified medical professional for confirmation.
-        </div>
-    `;
-    
-    updateHistoryUI();
-}
+        async function runAnalysis() {
+            let userReportData = "";
+            
+            if(activeMode === 'moles') {
+                let score = 0;
+                if(document.getElementById('q-a').checked) score++;
+                if(document.getElementById('q-b').checked) score++;
+                if(document.getElementById('q-c').checked) score++;
+                if(document.getElementById('q-d').checked) score++;
+                if(document.getElementById('q-e').checked) score++;
+                userReportData = `ABCDE Questionnaire Flags: ${score}/5`;
+            } else {
+                const col = document.getElementById('mouth-q-color').value;
+                const loc = document.getElementById('mouth-q-location').value;
+                const feel = document.getElementById('mouth-q-feeling').value;
+                userReportData = `Survey Context: ${col} patch found on the ${loc} feeling ${feel}.`;
+            }
 
-function updateHistoryUI() {
-    const container = document.getElementById('history-log');
-    const targetType = activeMode === 'moles' ? "Skin Mole" : "Mouth Lesion";
-    const filtered = scanHistory.filter(h => h.type === targetType);
-    
-    if(filtered.length === 0) {
-        container.innerHTML = "No historical tracking snapshots saved for this category.";
-        return;
-    }
-    // FIX: Added backticks inside the map function below
-    container.innerHTML = filtered.map(entry => `
-        <div style="border-bottom:1px solid #ccc; padding: 6px 0;">
-            📅 <b>${entry.date} at ${entry.time}</b><br>
-            ↳ Result: <span style="font-weight:bold;">${entry.finding}</span><br>
-            <small style="color:#666;">${entry.notes}</small>
-        </div>
-    `).join('');
-}
+            let topPrediction = ""; 
+            let confidence = "0%";
 
-async function stopAndBack() {
-    if (webcam) {
-        try {
-            if(flashOn) { toggleFlash(); }
-            await webcam.stop();
-        } catch(e){}
-        webcam = null;
-        trackStream = null;
-    }
-    document.getElementById("webcam-container").innerHTML = "";
-    changeScreen('menu-screen');
-}
+            if (model && webcam) {
+                const prediction = await model.predict(webcam.canvas);
+                let highestProb = 0;
+                for (let i = 0; i < model.getTotalClasses(); i++) {
+                    if(prediction[i].probability > highestProb) {
+                        highestProb = prediction[i].probability;
+                        topPrediction = prediction[i].className;
+                        confidence = (highestProb * 100).toFixed(0) + "%";
+                    }
+                }
+            }
+
+            let infoObj = diagnosisDatabase[topPrediction] || {
+                desc: "The scanned visual target exhibits unique structural characteristics matching custom training dataset entries.",
+                adv: "Consult with a medical professional to review this specific visual structure formally.",
+                risk: "benign"
+            };
+
+            const logEntry = {
+                type: activeMode === 'moles' ? "Skin Mole" : "Mouth Lesion",
+                date: new Date().toLocaleDateString(),
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                notes: userReportData,
+                finding: `${topPrediction} (${confidence})`
+            };
+
+            scanHistory.unshift(logEntry);
+            localStorage.setItem('scanHistory', JSON.stringify(scanHistory));
+            
+            const accentColor = infoObj.risk === 'high' ? 'var(--danger)' : 'var(--success)';
+            
+            document.getElementById('result-display').innerHTML = `
+                <h3 style="color:${accentColor}; margin-top:0;">Assessment: ${topPrediction} (${confidence})</h3>
+                <p style="font-size:0.85rem; color:#666; margin: -5px 0 10px;">${userReportData}</p>
+                <div class="info-text"><b>Description:</b> ${infoObj.desc}</div>
+                <div class="info-text"><b>Guidance:</b> ${infoObj.adv}</div>
+                <div class="disclaimer-box">
+                    ⚠️ <b>AI Limitation Notification:</b> This machine learning output and mobile device usage serves as an educational, preliminary screening helper; it does not substitute for a professional clinical diagnosis. Make sure to double-check the physical label and consult a certified medical professional for confirmation.
+                </div>
+            `;
+            
+            updateHistoryUI();
+        }
+
+        function updateHistoryUI() {
+            const container = document.getElementById('history-log');
+            const targetType = activeMode === 'moles' ? "Skin Mole" : "Mouth Lesion";
+            const filtered = scanHistory.filter(h => h.type === targetType);
+            
+            if(filtered.length === 0) {
+                container.innerHTML = "No historical tracking snapshots saved for this category.";
+                return;
+            }
+            container.innerHTML = filtered.map(entry => `
+                <div style="border-bottom:1px solid #ccc; padding: 6px 0;">
+                    📅 <b>${entry.date} at ${entry.time}</b><br>
+                    ↳ Result: <span style="font-weight:bold;">${entry.finding}</span><br>
+                    <small style="color:#666;">${entry.notes}</small>
+                </div>
+            `).join('');
+        }
+
+        async function stopAndBack() {
+            if (webcam) {
+                try {
+                    if(flashOn) { toggleFlash(); }
+                    await webcam.stop();
+                } catch(e){}
+                webcam = null;
+                trackStream = null;
+            }
+            document.getElementById("webcam-container").innerHTML = "";
+            changeScreen('menu-screen');
+        }
+    </script>
+        
