@@ -431,19 +431,34 @@
             }
         }
 
-        async function toggleFlash() {
-            if (!webcam || !webcam.webcam) { alert("Camera not active."); return; }
-            try {
-                const stream = webcam.webcam.srcObject;
-                const videoTrack = stream.getVideoTracks()[0];
-                const capabilities = videoTrack.getCapabilities ? videoTrack.getCapabilities() : {};
-                if (!capabilities.torch) { alert("Flashlight not supported on this device/camera."); return; }
-                flashOn = !flashOn;
-                await videoTrack.applyConstraints({ advanced: [{ torch: flashOn }] });
-                document.getElementById('flash-btn').style.background = flashOn ? '#ef476f' : '#6c757d';
-                document.getElementById('flash-btn').innerText = flashOn ? "🔦 Flash ON" : "🔦 Flash";
-            } catch (err) { alert("Torch error: " + err.message); }
-        }
+        async function toggleCameraFacing() {
+    useFrontCamera = !useFrontCamera;
+    document.getElementById('flip-btn').innerText = useFrontCamera ? "🔄 Rear Cam" : "🔄 Front Cam";
+    
+    // Completely stop and wipe current webcam instance before restarting
+    if (webcam) {
+        try {
+            await webcam.stop();
+        } catch(e) {}
+        webcam = null;
+    }
+    document.getElementById("webcam-container").innerHTML = "";
+
+    try {
+        webcam = new tmImage.Webcam(200, 200, true); 
+        await webcam.setup({ facingMode: useFrontCamera ? "user" : "environment" }); 
+        await webcam.play();
+        
+        document.getElementById("webcam-container").appendChild(webcam.canvas);
+        window.requestAnimationFrame(loop);
+    } catch(err) {
+        alert("Your device or browser does not support switching to this camera.");
+        // Revert back if it fails
+        useFrontCamera = !useFrontCamera;
+        document.getElementById('flip-btn').innerText = useFrontCamera ? "🔄 Rear Cam" : "🔄 Front Cam";
+        startScanner();
+    }
+}
         
         async function runAnalysis() {
             let userReportData = "";
