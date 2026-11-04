@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -10,57 +10,80 @@
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>  
     
     <style>
-        :root { --bg: #f4f7f6; --primary: #2a6f97; --text: #2c3e50; --danger: #d90429; --success: #2b9348;}
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 70px;}
+        :root { 
+            --bg-gradient: linear-gradient(135deg, #e0f2fe 0%, #f4f7f6 50%, #ede9fe 100%);
+            --primary: #4361ee; 
+            --primary-gradient: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            --accent-pink: #f72585;
+            --accent-green: #4cc9f0;
+            --text: #2b2d42; 
+            --danger: #ef476f; 
+            --success: #06d6a0;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; background: var(--bg-gradient); color: var(--text); padding-bottom: 80px; min-height: 100vh; }
         .screen { display: none; min-height: 100vh; flex-direction: column; align-items: center; justify-content: flex-start; padding: 20px; box-sizing: border-box; text-align: center; }
         .active { display: flex; }
         
-        #splash-screen { background: var(--primary); color: white; justify-content: center; transition: opacity 0.5s ease; }
-        input, select, button { padding: 12px; margin: 8px 0; width: 85%; max-width: 300px; border-radius: 8px; border: 1px solid #ccc; font-size: 1rem; box-sizing: border-box; }
-        button { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; }
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 90%; max-width: 450px; box-sizing: border-box; margin-bottom: 15px; }
-        .option-btn { background: #e0f2fe; color: var(--primary); border: 2px solid var(--primary); margin: 10px; font-size: 1.1rem; width: 85%; max-width: 300px;}
+        #splash-screen { background: var(--primary-gradient); color: white; justify-content: center; align-items: center; transition: opacity 0.5s ease; }
         
+        input, select, button { padding: 14px; margin: 8px 0; width: 85%; max-width: 320px; border-radius: 16px; border: 2px solid #e2e8f0; font-size: 1rem; box-sizing: border-box; background: white; outline: none; transition: all 0.2s; }
+        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15); }
+        
+        button { background: var(--primary-gradient); color: white; border: none; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3); border-radius: 50px; }
+        button:active { transform: scale(0.97); }
+
+        .card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 30px 20px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); width: 90%; max-width: 420px; box-sizing: border-box; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.8); }
+        
+        .option-btn { background: white; color: var(--primary); border: 2px solid #4361ee; margin: 10px; font-size: 1.05rem; width: 85%; max-width: 320px; border-radius: 20px; box-shadow: 0 4px 12px rgba(67,97,238,0.08); font-weight: 600; }
+        .option-btn:hover { background: #f0f4ff; }
+
         /* Dashboard & Stats Styling */
-        .dashboard-header { width: 100%; max-width: 450px; text-align: left; margin-bottom: 15px; }
-        .scans-scroll-container { display: flex; overflow-x: auto; gap: 12px; width: 100%; max-width: 450px; padding-bottom: 10px; scrollbar-width: thin; }
-        .scan-thumbnail-card { background: white; min-width: 130px; padding: 10px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: left; flex-shrink: 0; }
-        .scan-thumbnail-card img { width: 100%; height: 90px; object-fit: cover; border-radius: 6px; }
+        .dashboard-header { width: 100%; max-width: 420px; text-align: left; margin-bottom: 15px; }
+        .scans-scroll-container { display: flex; overflow-x: auto; gap: 12px; width: 100%; max-width: 420px; padding-bottom: 10px; scrollbar-width: none; }
+        .scans-scroll-container::-webkit-scrollbar { display: none; }
         
-        .stats-box { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 100%; max-width: 450px; box-sizing: border-box; display: flex; align-items: center; justify-content: space-around; margin-top: 15px; }
-        .stat-item { text-align: left; font-size: 0.9rem; }
+        .scan-thumbnail-card { background: white; min-width: 120px; padding: 10px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); text-align: left; flex-shrink: 0; border: 1px solid #edf2f7; }
+        .scan-thumbnail-card img { width: 100%; height: 85px; object-fit: cover; border-radius: 12px; }
         
-        /* Bottom Navigation Bar */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 12px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000; }
-        .nav-item { background: none; border: none; font-size: 1.2rem; cursor: pointer; width: auto; margin: 0; padding: 0; color: #555; }
-        .nav-item.active-nav { color: var(--primary); font-weight: bold; }
+        .stats-box { background: white; padding: 18px; border-radius: 24px; box-shadow: 0 8px 25px rgba(0,0,0,0.05); width: 100%; max-width: 420px; box-sizing: border-box; display: flex; align-items: center; justify-content: space-around; margin-top: 10px; border: 1px solid #edf2f7; }
+        .stat-item { text-align: left; font-size: 0.85rem; font-weight: 500; }
         
-        .snapshot-preview { width: 100%; max-width: 180px; height: auto; border-radius: 8px; border: 2px solid var(--primary); margin: 10px auto; display: block; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        /* Bottom Bubbly Navigation Bar */
+        .bottom-nav { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(15px); display: flex; justify-content: space-around; padding: 12px 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 30px; z-index: 1000; border: 1px solid rgba(255,255,255,0.5); }
+        .nav-item { background: none; border: none; font-size: 1.4rem; cursor: pointer; width: auto; margin: 0; padding: 8px 12px; border-radius: 50px; transition: all 0.2s; }
+        .nav-item.active-nav { background: #e0f2fe; color: var(--primary); transform: translateY(-3px); }
+        
+        .snapshot-preview { width: 100%; max-width: 160px; height: auto; border-radius: 16px; border: 3px solid var(--primary); margin: 10px auto; display: block; box-shadow: 0 6px 20px rgba(67,97,238,0.2); }
         
         /* Report Sections Styling */
-        .results-box { text-align: left; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: 15px; border: 1px solid #e9ecef; }
-        .report-step { margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
+        .results-box { text-align: left; background: white; padding: 22px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); margin-top: 15px; border: 1px solid #edf2f7; width: 90%; max-width: 420px; box-sizing: border-box; }
+        .report-step { margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px dashed #f0f4f8; }
         .report-step:last-child { border-bottom: none; margin-bottom: 0; }
-        .report-num { color: #888; font-weight: bold; font-size: 0.85rem; margin-right: 8px; }
-        .report-title { font-size: 1.05rem; font-weight: 700; color: var(--text); }
-        .info-text { margin: 8px 0; font-size: 0.9rem; line-height: 1.45; color: #444; }
-        .disclaimer-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px; font-size: 0.85rem; margin-top: 15px; text-align: left; border-radius: 4px; }
+        .report-num { color: #fff; background: var(--primary); font-weight: bold; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; margin-right: 6px; }
+        .report-title { font-size: 1rem; font-weight: 700; color: var(--text); }
+        .info-text { margin: 6px 0; font-size: 0.88rem; line-height: 1.45; color: #4a5568; }
+        .disclaimer-box { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 12px; font-size: 0.8rem; margin-top: 15px; text-align: left; border-radius: 12px; color: #92400e; }
+        
+        .camera-controls { display: flex; gap: 10px; width: 85%; max-width: 320px; justify-content: center; margin-bottom: 10px; }
+        .camera-controls button { width: 48%; margin: 0; padding: 10px; font-size: 0.9rem; border-radius: 14px; background: #6c757d; }
     </style>
 </head>
 <body>
 
     <!-- 1. SPLASH SCREEN -->
     <div id="splash-screen" class="screen active">
-        <img src="logo.png" alt="SkinGuard Diagnostics Logo" style="width: 150px; height: auto; margin-bottom: 20px;">
-        <h1 style="font-size: 1.6rem; margin: 0 0 5px 0;">SkinGuard Diagnostics</h1>
-        <p style="font-size: 1rem; font-weight: 400; opacity: 0.9;">Advanced Screening Assistant</p>
+        <div style="background: white; padding: 25px; border-radius: 35px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-bottom: 15px;">
+            <span style="font-size: 3rem;">🩺</span>
+        </div>
+        <h1 style="font-size: 1.8rem; margin: 5px 0; font-weight: 800; letter-spacing: -0.5px;">SkinGuard Diagnostics</h1>
+        <p style="font-size: 0.95rem; opacity: 0.9; font-weight: 400;">Your Intelligent Skin & Oral Care Assistant</p>
     </div>
 
     <!-- 2. LOGIN / ONBOARDING SCREEN -->
     <div id="login-screen" class="screen">
-        <div class="card" style="margin-top: 40px;">
-            <h2>SkinGuard Diagnostics</h2>
-            <p>Log in or save your profile details to track scans securely.</p>
+        <div class="card" style="margin-top: 20px;">
+            <h2 style="color: var(--primary); margin-top: 0;">Welcome! ✨</h2>
+            <p style="font-size: 0.9rem; color: #718096;">Set up your profile to securely log and track your scans over time.</p>
             <input type="text" id="user-name" placeholder="Full Name" required>
             <select id="user-gender">
                 <option value="">Select Gender</option>
@@ -70,31 +93,31 @@
             </select>
             <input type="number" id="user-age" placeholder="Age" min="0">
             <input type="date" id="user-birthday" placeholder="Birthday">
-            <button onclick="saveProfile()">Save & Login</button>
+            <button onclick="saveProfile()" style="margin-top: 10px; width: 100%; max-width: none;">Save & Continue 🚀</button>
         </div>
     </div>
 
     <!-- 3. MAIN MENU / DASHBOARD SCREEN -->
     <div id="menu-screen" class="screen">
-        <div class="dashboard-header">
-            <h2 id="welcome-message" style="margin-bottom: 5px;">Hello!</h2>
-            <div id="weather-widget" style="font-size: 0.85rem; color: #555;">🌤️ Checking environmental UV index...</div>
+        <div class="dashboard-header" style="margin-top: 10px;">
+            <h2 id="welcome-message" style="margin-bottom: 2px; font-size: 1.5rem;">Hello! 👋</h2>
+            <div id="weather-widget" style="font-size: 0.82rem; color: #4a5568; background: white; padding: 8px 12px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">🌤️ Checking environmental UV index...</div>
         </div>
 
-        <div class="dashboard-header" style="margin-top: 10px;">
-            <h4 style="margin: 0 0 8px 0; color: #333;">Your Last Scanning</h4>
+        <div class="dashboard-header" style="margin-top: 15px;">
+            <h4 style="margin: 0 0 8px 0; color: #2d3748; font-size: 1rem;">Your Last Scanning 📸</h4>
         </div>
         <div id="recent-scans-scroll" class="scans-scroll-container">
             <div class="scan-thumbnail-card">
-                <div style="background:#ddd; height:90px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; color:#666;">No Scan</div>
-                <p style="margin: 6px 0 2px; font-weight:bold; font-size:0.85rem;">Scan A</p>
-                <small style="color:#777; font-size:0.75rem;">--/--/----</small>
+                <div style="background:#edf2f7; height:85px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; color:#a0aec0;">No Scan</div>
+                <p style="margin: 6px 0 2px; font-weight:bold; font-size:0.8rem;">Scan A</p>
+                <small style="color:#a0aec0; font-size:0.7rem;">--/--/----</small>
             </div>
         </div>
 
         <div class="stats-box">
-            <div style="position:relative; width: 70px; height: 70px; border-radius: 50%; background: conic-gradient(var(--primary) 0deg 270deg, #e9ecef 270deg 360deg); display: flex; align-items: center; justify-content: center;">
-                <div style="width: 54px; height: 54px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.95rem;" id="stat-total-badge">0</div>
+            <div style="position:relative; width: 64px; height: 64px; border-radius: 50%; background: conic-gradient(var(--primary) 0deg 270deg, #edf2f7 270deg 360deg); display: flex; align-items: center; justify-content: center;">
+                <div style="width: 50px; height: 50px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.95rem; color: var(--primary);" id="stat-total-badge">0</div>
             </div>
             <div class="stat-item">
                 <p style="margin: 2px 0;">📸 Photos uploaded: <b id="stat-total">0</b></p>
@@ -103,96 +126,109 @@
             </div>
         </div>
 
-        <p style="margin-top: 20px; font-weight: 500;">Select an area for assessment:</p>
+        <p style="margin-top: 20px; font-weight: 600; font-size: 0.95rem;">Select an area for assessment:</p>
         <button class="option-btn" onclick="goToOption('moles')">🟢 Skin Moles Assessment</button>
-        <button class="option-btn" onclick="goToOption('mouth')" style="background:#f3e8ff; color:#6b21a8; border-color:#6b21a8;">👄 Mouth Lesions Assessment</button>
+        <button class="option-btn" onclick="goToOption('mouth')" style="border-color: #7209b7; color: #7209b7;">👄 Mouth Lesions Assessment</button>
     </div>
 
     <!-- 4. ABCDE QUESTIONS SCREEN -->
     <div id="abcde-screen" class="screen">
-        <div class="card">
-            <h3>ABCDE Risk Evaluation</h3>
-            <p style="font-size: 0.9rem; color: #555;">Check your skin using the NHS checklist criteria:</p>
-            <div style="text-align: left; margin-bottom: 15px; font-size: 0.9rem;">
-                <div style="margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+        <div class="card" style="text-align: left;">
+            <h3 style="margin-top:0; color: var(--primary);">ABCDE Risk Evaluation</h3>
+            <p style="font-size: 0.85rem; color: #718096; margin-bottom: 15px;">Check your skin using the NHS checklist criteria:</p>
+            
+            <div style="font-size: 0.88rem;">
+                <div style="margin-bottom: 12px; border-bottom: 1px solid #edf2f7; padding-bottom: 8px;">
                     <b>A - Asymmetrical:</b> Is your mole an uneven shape?<br>
-                    <label><input type="radio" name="q-a" value="yes"> Yes</label> &nbsp;&nbsp;&nbsp;
-                    <label><input type="radio" name="q-a" value="no" checked> No</label>
+                    <label style="cursor:pointer;"><input type="radio" name="q-a" value="yes"> Yes</label> &nbsp;&nbsp;&nbsp;
+                    <label style="cursor:pointer;"><input type="radio" name="q-a" value="no" checked> No</label>
                 </div>
-                <div style="margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+                <div style="margin-bottom: 12px; border-bottom: 1px solid #edf2f7; padding-bottom: 8px;">
                     <b>B - Border:</b> Is the edge ragged?<br>
-                    <label><input type="radio" name="q-b" value="yes"> Yes</label> &nbsp;&nbsp;&nbsp;
-                    <label><input type="radio" name="q-b" value="no" checked> No</label>
+                    <label style="cursor:pointer;"><input type="radio" name="q-b" value="yes"> Yes</label> &nbsp;&nbsp;&nbsp;
+                    <label style="cursor:pointer;"><input type="radio" name="q-b" value="no" checked> No</label>
                 </div>
-                <div style="margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+                <div style="margin-bottom: 12px; border-bottom: 1px solid #edf2f7; padding-bottom: 8px;">
                     <b>C - Colours:</b> Does it have different colours or changed?<br>
-                    <label><input type="radio" name="q-c" value="yes" onclick="toggleColorInput(true)"> Yes</label> &nbsp;&nbsp;&nbsp;
-                    <label><input type="radio" name="q-c" value="no" checked onclick="toggleColorInput(false)"> No</label>
+                    <label style="cursor:pointer;"><input type="radio" name="q-c" value="yes" onclick="toggleColorInput(true)"> Yes</label> &nbsp;&nbsp;&nbsp;
+                    <label style="cursor:pointer;"><input type="radio" name="q-c" value="no" checked onclick="toggleColorInput(false)"> No</label>
                     <div id="color-input-container" style="display:none; margin-top: 8px;">
-                        <input type="text" id="q-c-text" placeholder="Type colors (e.g., black, brown, red)" style="width:100%; max-width:100%; padding: 8px; font-size: 0.9rem;">
+                        <input type="text" id="q-c-text" placeholder="Type colors (e.g., black, brown)" style="width:100%; max-width:100%; padding: 8px; font-size: 0.85rem;">
                     </div>
                 </div>
-                <div style="margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-                    <b>D - Diameter:</b> Is it bigger than 6 millimetres?<br>
-                    <label><input type="radio" name="q-d" value="yes"> Yes</label> &nbsp;&nbsp;&nbsp;
-                    <label><input type="radio" name="q-d" value="no" checked> No</label>
+                <div style="margin-bottom: 12px; border-bottom: 1px solid #edf2f7; padding-bottom: 8px;">
+                    <b>D - Diameter:</b> Is it bigger than 6mm?<br>
+                    <label style="cursor:pointer;"><input type="radio" name="q-d" value="yes"> Yes</label> &nbsp;&nbsp;&nbsp;
+                    <label style="cursor:pointer;"><input type="radio" name="q-d" value="no" checked> No</label>
                 </div>
-                <div style="margin-bottom: 5px;">
-                    <b>E - Evolving:</b> Has it changed size, shape or colour?<br>
-                    <label><input type="radio" name="q-e" value="yes"> Yes</label> &nbsp;&nbsp;&nbsp;
-                    <label><input type="radio" name="q-e" value="no" checked> No</label>
+                <div style="margin-bottom: 10px;">
+                    <b>E - Evolving:</b> Has it changed size or shape?<br>
+                    <label style="cursor:pointer;"><input type="radio" name="q-e" value="yes"> Yes</label> &nbsp;&nbsp;&nbsp;
+                    <label style="cursor:pointer;"><input type="radio" name="q-e" value="no" checked> No</label>
                 </div>
             </div>
-            <button onclick="startScanner()">Proceed to Scanner</button>
+            <button onclick="startScanner()" style="width:100%; max-width:none; margin-top:15px;">Proceed to Scanner 📷</button>
         </div>
     </div>
 
     <!-- 5. MOUTH LESIONS SURVEY SCREEN -->
     <div id="mouth-survey-screen" class="screen">
-        <div class="card">
-            <h3>Mouth Lesion Assessment</h3>
-            <p>Please answer a few questions about how the lesion feels and looks:</p>
-            <div style="text-align: left; margin-bottom: 15px;">
+        <div class="card" style="text-align: left;">
+            <h3 style="margin-top:0; color: #7209b7;">Mouth Lesion Assessment</h3>
+            <p style="font-size: 0.85rem; color: #718096; margin-bottom: 15px;">Answer a few quick details about the lesion:</p>
+            
+            <div style="font-size: 0.88rem;">
                 <label><b>1. What color is the lesion?</b></label><br>
-                <select id="mouth-q-color" style="width:100%;">
+                <select id="mouth-q-color" style="width:100%; margin-bottom: 12px;">
                     <option value="Red">Primarily Red (Erythematous)</option>
                     <option value="White">Primarily White (Leukoplakia-like)</option>
                     <option value="Mixed">Mixed Red and White</option>
-                    <option value="Ulcerated">Open Sore / Yellowish-White Center</option>
-                </select><br><br>
-                <label><b>2. Where is it located in the mouth?</b></label><br>
-                <select id="mouth-q-location" style="width:100%;">
+                    <option value="Ulcerated">Open Sore / Yellowish Center</option>
+                </select>
+
+                <label><b>2. Where is it located?</b></label><br>
+                <select id="mouth-q-location" style="width:100%; margin-bottom: 12px;">
                     <option value="Tongue">On or under the tongue</option>
                     <option value="Cheek">Inside the cheeks (buccal mucosa)</option>
-                    <option value="Lips">On the lips or gums</option>
+                    <option value="Lips">On lips or gums</option>
                     <option value="Palate">Roof of the mouth (palate)</option>
-                </select><br><br>
+                </select>
+
                 <label><b>3. How does it feel?</b></label><br>
                 <select id="mouth-q-feeling" style="width:100%;">
-                    <option value="Painful">Painful, tender, or burning sensation</option>
-                    <option value="Painless-Hard">Painless but feels hard/firm to touch</option>
+                    <option value="Painful">Painful, tender, or burning</option>
+                    <option value="Painless-Hard">Painless but firm/hard</option>
                     <option value="Painless-Soft">Painless and soft/velvety</option>
-                    <option value="Rough">Rough, crusty, or scraping friction</option>
+                    <option value="Rough">Rough or scraping friction</option>
                 </select>
             </div>
-            <button onclick="startScanner()">Proceed to Scanner</button>
+            <button onclick="startScanner()" style="width:100%; max-width:none; margin-top:15px; background: linear-gradient(135deg, #7209b7 0%, #4361ee 100%);">Proceed to Scanner 📷</button>
         </div>
     </div>
 
     <!-- 6. SCANNER & LOG TRACKING SCREEN -->
     <div id="scanner-screen" class="screen">
-        <div class="card">
-            <h3 id="scanner-title">Scanner Active</h3>
-            <div id="webcam-container" style="background: #000; width: 200px; height: 200px; margin: 0 auto 15px; border-radius: 8px; overflow:hidden;"></div>
-            <button id="flash-btn" onclick="toggleFlash()" style="background:#6c757d; margin-bottom:10px;">🔦 Toggle Flashlight</button>
-            <button id="scan-trigger" onclick="runAnalysis()">Analyze & Track Image</button>
-            <div id="result-display" class="results-box" style="display:none;"></div>
+        <div class="card" style="width: 100%; max-width: 420px;">
+            <h3 id="scanner-title" style="margin-top:0; color: var(--primary);">Scanner Active</h3>
+            
+            <div id="webcam-container" style="background: #000; width: 200px; height: 200px; margin: 0 auto 12px; border-radius: 20px; overflow:hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15);"></div>
+            
+            <!-- Camera Control Buttons (Flash & Flip Camera) -->
+            <div class="camera-controls" style="margin: 0 auto 10px auto;">
+                <button id="flash-btn" onclick="toggleFlash()">🔦 Flash</button>
+                <button id="flip-btn" onclick="toggleCameraFacing()" style="background: var(--primary);">🔄 Flip Camera</button>
+            </div>
+
+            <button id="scan-trigger" onclick="runAnalysis()" style="width: 85%; max-width: 320px; border-radius: 20px;">✨ Analyze & Track Image</button>
+            
+            <div id="result-display" style="display:none;"></div>
+            
             <br>
-            <button onclick="stopAndBack()" style="background:#555;">Back to Dashboard</button>
+            <button onclick="stopAndBack()" style="background:#718096; width: 85%; max-width: 320px; border-radius: 20px; font-size: 0.9rem; padding: 10px;">Back to Dashboard</button>
         </div>
     </div>
 
-    <!-- BOTTOM NAVIGATION BAR -->
+    <!-- BOTTOM BUBBLY NAVIGATION BAR -->
     <div class="bottom-nav">
         <button class="nav-item active-nav" onclick="changeScreen('menu-screen')">🏠</button>
         <button class="nav-item" onclick="goToOption('moles')">🟢</button>
@@ -206,7 +242,7 @@
         let model, webcam;
         let activeMode = ''; 
         let flashOn = false;
-        let trackStream = null;
+        let useFrontCamera = false; // Tracks front vs rear camera mode
 
         const MOLE_MODEL_URL = "https://teachablemachine.withgoogle.com/models/qHXgJmz2q/"; 
         const MOUTH_MODEL_URL = "https://teachablemachine.withgoogle.com/models/T-1ag-a9U/"; 
@@ -300,12 +336,11 @@
             }
         };
 
-        // Splash screen initialization check
         setTimeout(() => { 
             if(!userProfile.name) {
                 changeScreen('login-screen');
             } else {
-                document.getElementById('welcome-message').innerText = `Hello, ${userProfile.name}!`;
+                document.getElementById('welcome-message').innerText = `Hello, ${userProfile.name}! 👋`;
                 fetchWeatherAlert();
                 updateDashboardStats();
                 changeScreen('menu-screen');
@@ -326,7 +361,7 @@
             if(!userProfile.name) { alert("Please enter your name to continue."); return; }
             
             localStorage.setItem('userProfile', JSON.stringify(userProfile));
-            document.getElementById('welcome-message').innerText = `Hello, ${userProfile.name}!`;
+            document.getElementById('welcome-message').innerText = `Hello, ${userProfile.name}! 👋`;
             fetchWeatherAlert();
             updateDashboardStats();
             changeScreen('menu-screen');
@@ -343,7 +378,7 @@
         }
 
         function fetchWeatherAlert() {
-            document.getElementById('weather-widget').innerHTML = "☀️ <b>UV Index Update:</b> High UV levels observed in your area today. Ensure proper sun protection.";
+            document.getElementById('weather-widget').innerHTML = "☀️ <b>UV Index Update:</b> High levels today. Ensure proper sun protection!";
         }
 
         function goToOption(mode) {
@@ -363,28 +398,30 @@
             }
 
             changeScreen('scanner-screen');
-            document.getElementById('scanner-title').innerText = activeMode === 'moles' ? "Mole Scanner Active" : "Mouth Lesion Scanner Active";
+            document.getElementById('scanner-title').innerText = activeMode === 'moles' ? "🟢 Mole Scanner Active" : "👄 Mouth Scanner Active";
             document.getElementById('result-display').style.display = "none";
 
             try {
                 const targetModelURL = activeMode === 'moles' ? MOLE_MODEL_URL : MOUTH_MODEL_URL;
                 model = await tmImage.load(targetModelURL + "model.json", targetModelURL + "metadata.json");
                 
+                // Set facingMode depending on useFrontCamera toggle
                 webcam = new tmImage.Webcam(200, 200, true); 
-                await webcam.setup({ facingMode: "environment" }); 
+                await webcam.setup({ facingMode: useFrontCamera ? "user" : "environment" }); 
                 await webcam.play();
-                
-                if (webcam.stream) { trackStream = webcam.stream.getVideoTracks(); }
                 
                 document.getElementById("webcam-container").innerHTML = "";
                 document.getElementById("webcam-container").appendChild(webcam.canvas);
-                document.getElementById('result-display').style.display = "block";
-                document.getElementById('result-display').innerText = "Camera synchronized. Position subject and analyze.";
                 window.requestAnimationFrame(loop);
             } catch(e) {
-                document.getElementById('result-display').style.display = "block";
-                document.getElementById('result-display').innerText = "Camera synchronization error. Please verify setup.";
+                alert("Camera initialization error. Please verify browser permissions.");
             }
+        }
+
+        async function toggleCameraFacing() {
+            useFrontCamera = !useFrontCamera;
+            document.getElementById('flip-btn').innerText = useFrontCamera ? "🔄 Rear Cam" : "🔄 Front Cam";
+            await startScanner(); // Restart webcam stream with new facing mode
         }
 
         async function loop() {
@@ -400,11 +437,11 @@
                 const stream = webcam.webcam.srcObject;
                 const videoTrack = stream.getVideoTracks()[0];
                 const capabilities = videoTrack.getCapabilities ? videoTrack.getCapabilities() : {};
-                if (!capabilities.torch) { alert("Flashlight not supported on this device."); return; }
+                if (!capabilities.torch) { alert("Flashlight not supported on this device/camera."); return; }
                 flashOn = !flashOn;
                 await videoTrack.applyConstraints({ advanced: [{ torch: flashOn }] });
-                document.getElementById('flash-btn').style.background = flashOn ? '#d90429' : '#6c757d';
-                document.getElementById('flash-btn').innerText = flashOn ? "🔦 Flash ON" : "🔦 Toggle Flashlight";
+                document.getElementById('flash-btn').style.background = flashOn ? '#ef476f' : '#6c757d';
+                document.getElementById('flash-btn').innerText = flashOn ? "🔦 Flash ON" : "🔦 Flash";
             } catch (err) { alert("Torch error: " + err.message); }
         }
         
@@ -426,12 +463,12 @@
                 if(eVal === 'yes') score++;
 
                 let colorDetails = (cVal === 'yes' && cText) ? ` [Colors: ${cText}]` : '';
-                userReportData = `ABCDE Flags: ${score}/5`;
+                userReportData = `ABCDE Score: ${score}/5`;
             } else {
                 const col = document.getElementById('mouth-q-color').value;
                 const loc = document.getElementById('mouth-q-location').value;
                 const feel = document.getElementById('mouth-q-feeling').value;
-                userReportData = `Survey: ${col} patch on ${loc} (${feel})`;
+                userReportData = `Survey: ${col} on ${loc} (${feel})`;
             }
 
             let topPrediction = ""; 
@@ -481,35 +518,37 @@
             const accentColor = infoObj.risk === 'high' ? 'var(--danger)' : 'var(--success)';
             
             document.getElementById('result-display').innerHTML = `
-                ${capturedImageData ? `<img src="${capturedImageData}" class="snapshot-preview" alt="Snapshot">` : ''}
-                
-                <!-- 01 Your Result -->
-                <div class="report-step">
-                    <span class="report-num">01</span><span class="report-title">Your Result</span>
-                    <h3 style="color:${accentColor}; margin: 6px 0 2px;">${topPrediction} (${confidence})</h3>
-                    <p style="font-size:0.85rem; color:#666; margin: 0;">${userReportData}</p>
-                </div>
+                <div class="results-box">
+                    ${capturedImageData ? `<img src="${capturedImageData}" class="snapshot-preview" alt="Snapshot">` : ''}
+                    
+                    <!-- 01 Your Result -->
+                    <div class="report-step">
+                        <span class="report-num">01</span><span class="report-title">Your Result</span>
+                        <h3 style="color:${accentColor}; margin: 6px 0 2px; font-size: 1.1rem;">${topPrediction} (${confidence})</h3>
+                        <p style="font-size:0.82rem; color:#718096; margin: 0;">${userReportData}</p>
+                    </div>
 
-                <!-- 02 What is it? -->
-                <div class="report-step">
-                    <span class="report-num">02</span><span class="report-title">What is it?</span>
-                    <p class="info-text">${infoObj.desc}</p>
-                </div>
+                    <!-- 02 What is it? -->
+                    <div class="report-step">
+                        <span class="report-num">02</span><span class="report-title">What is it?</span>
+                        <p class="info-text">${infoObj.desc}</p>
+                    </div>
 
-                <!-- 03 Causes -->
-                <div class="report-step">
-                    <span class="report-num">03</span><span class="report-title">Causes</span>
-                    <p class="info-text">${infoObj.causes}</p>
-                </div>
+                    <!-- 03 Causes -->
+                    <div class="report-step">
+                        <span class="report-num">03</span><span class="report-title">Causes</span>
+                        <p class="info-text">${infoObj.causes}</p>
+                    </div>
 
-                <!-- 04 Preventive Measures -->
-                <div class="report-step">
-                    <span class="report-num">04</span><span class="report-title">Preventive Measures</span>
-                    <p class="info-text">${infoObj.preventive}</p>
-                </div>
+                    <!-- 04 Preventive Measures -->
+                    <div class="report-step" style="border-bottom:none; margin-bottom:0; padding-bottom:0;">
+                        <span class="report-num">04</span><span class="report-title">Preventive Measures</span>
+                        <p class="info-text">${infoObj.preventive}</p>
+                    </div>
 
-                <div class="disclaimer-box">
-                    ⚠️ <b>AI Limitation Notification:</b> This machine learning output serves as an educational, preliminary screening helper; it does not substitute for a professional clinical diagnosis.
+                    <div class="disclaimer-box">
+                        ⚠️ <b>AI Note:</b> Educational screening helper; consult a certified specialist.
+                    </div>
                 </div>
             `;
             document.getElementById('result-display').style.display = 'block';
@@ -529,18 +568,18 @@
             if(totalScans === 0) {
                 scrollContainer.innerHTML = `
                     <div class="scan-thumbnail-card">
-                        <div style="background:#eee; height:90px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.7rem; color:#777;">No Scans</div>
+                        <div style="background:#edf2f7; height:85px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; color:#a0aec0;">No Scans</div>
                         <p style="margin: 6px 0 2px; font-weight:bold; font-size:0.8rem;">No Scan</p>
-                        <small style="color:#777; font-size:0.7rem;">--/--/----</small>
+                        <small style="color:#a0aec0; font-size:0.7rem;">--/--/----</small>
                     </div>`;
                 return;
             }
 
             scrollContainer.innerHTML = scanHistory.slice(0, 5).map((entry, index) => `
                 <div class="scan-thumbnail-card">
-                    ${entry.image ? `<img src="${entry.image}">` : `<div style="background:#ddd; height:90px; border-radius:6px;"></div>`}
+                    ${entry.image ? `<img src="${entry.image}">` : `<div style="background:#edf2f7; height:85px; border-radius:12px;"></div>`}
                     <p style="margin: 6px 0 2px; font-weight:bold; font-size:0.8rem;">Scan ${String.fromCharCode(65 + index)}</p>
-                    <small style="color:#777; font-size:0.7rem;">${entry.date}</small>
+                    <small style="color:#a0aec0; font-size:0.7rem;">${entry.date}</small>
                 </div>
             `).join('');
         }
@@ -548,7 +587,7 @@
         async function stopAndBack() {
             if (webcam) {
                 try { if(flashOn) { toggleFlash(); } await webcam.stop(); } catch(e){}
-                webcam = null; trackStream = null;
+                webcam = null;
             }
             document.getElementById("webcam-container").innerHTML = "";
             updateDashboardStats();
