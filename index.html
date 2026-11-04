@@ -391,38 +391,55 @@
             document.getElementById('color-input-container').style.display = show ? 'block' : 'none';
         }
 
-        async function startScanner() {
-            if (webcam) {
-                try { await webcam.stop(); } catch(e) {}
-                webcam = null;
-            }
+        let currentVideoTrack = null;
 
-            changeScreen('scanner-screen');
-            document.getElementById('scanner-title').innerText = activeMode === 'moles' ? "🟢 Mole Scanner Active" : "👄 Mouth Scanner Active";
-            document.getElementById('result-display').style.display = "none";
+async function startScanner() {
+    if (webcam) {
+        try { await webcam.stop(); } catch(e) {}
+        webcam = null;
+    }
 
-            try {
-                const targetModelURL = activeMode === 'moles' ? MOLE_MODEL_URL : MOUTH_MODEL_URL;
-                model = await tmImage.load(targetModelURL + "model.json", targetModelURL + "metadata.json");
-                
-                // Set facingMode depending on useFrontCamera toggle
-                webcam = new tmImage.Webcam(200, 200, true); 
-                await webcam.setup({ facingMode: useFrontCamera ? "user" : "environment" }); 
-                await webcam.play();
-                
-                document.getElementById("webcam-container").innerHTML = "";
-                document.getElementById("webcam-container").appendChild(webcam.canvas);
-                window.requestAnimationFrame(loop);
-            } catch(e) {
-                alert("Camera initialization error. Please verify browser permissions.");
+    changeScreen('scanner-screen');
+    document.getElementById('scanner-title').innerText = activeMode === 'moles' ? "🟢 Mole Scanner Active" : "👄 Mouth Scanner Active";
+    document.getElementById('result-display').style.display = "none";
+
+    try {
+        const targetModelURL = activeMode === 'moles' ? MOLE_MODEL_URL : MOUTH_MODEL_URL;
+        model = await tmImage.load(targetModelURL + "model.json", targetModelURL + "metadata.json");
+        
+        webcam = new tmImage.Webcam(200, 200, true); 
+
+        // Direct hardware constraint request for mobile browsers
+        const constraints = {
+            video: {
+                facingMode: useFrontCamera ? "user" : { exact: "environment" }
             }
+        };
+
+        try {
+            await webcam.setup(constraints.video);
+        } catch (facingErr) {
+            // Fallback for phones that don't support the 'exact' keyword restriction
+            await webcam.setup({ facingMode: useFrontCamera ? "user" : "environment" });
         }
 
-        async function toggleCameraFacing() {
-            useFrontCamera = !useFrontCamera;
-            document.getElementById('flip-btn').innerText = useFrontCamera ? "🔄 Rear Cam" : "🔄 Front Cam";
-            await startScanner(); // Restart webcam stream with new facing mode
-        }
+        await webcam.play();
+        
+        document.getElementById("webcam-container").innerHTML = "";
+        document.getElementById("webcam-container").appendChild(webcam.canvas);
+        window.requestAnimationFrame(loop);
+    } catch(e) {
+        alert("Camera error: Please ensure camera permissions are allowed and no other app is using your camera.");
+    }
+}
+
+async function toggleCameraFacing() {
+    useFrontCamera = !useFrontCamera;
+    document.getElementById('flip-btn').innerText = useFrontCamera ? "🔄 Rear Cam" : "🔄 Front Cam";
+    
+    // Completely restart the scanner with the new hardware lens rule
+    await startScanner();
+}
 
         async function loop() {
             if(webcam && webcam.canvas) {
