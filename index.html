@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -11,46 +11,56 @@
     
     <style>
         :root { --bg: #f4f7f6; --primary: #2a6f97; --text: #2c3e50; --danger: #d90429; --success: #2b9348;}
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; background: var(--bg); color: var(--text); }
-        .screen { display: none; min-height: 100vh; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; text-align: center; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; background: var(--bg); color: var(--text); padding-bottom: 70px;}
+        .screen { display: none; min-height: 100vh; flex-direction: column; align-items: center; justify-content: flex-start; padding: 20px; box-sizing: border-box; text-align: center; }
         .active { display: flex; }
         
-        /* Styling for captured mole snapshot thumbnail */
-        .snapshot-preview {
-            width: 100%;
-            max-width: 180px;
-            height: auto;
-            border-radius: 8px;
-            border: 2px solid var(--primary);
-            margin: 10px auto;
-            display: block;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        }
-
-        #splash-screen { background: var(--primary); color: white; transition: opacity 0.5s ease; }
+        #splash-screen { background: var(--primary); color: white; justify-content: center; transition: opacity 0.5s ease; }
         input, select, button { padding: 12px; margin: 8px 0; width: 85%; max-width: 300px; border-radius: 8px; border: 1px solid #ccc; font-size: 1rem; box-sizing: border-box; }
         button { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; }
-        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 90%; max-width: 450px; box-sizing: border-box; }
-        .option-btn { background: #e0f2fe; color: var(--primary); border: 2px solid var(--primary); margin: 10px; font-size: 1.2rem; width: 85%; max-width: 300px;}
-        #history-log { margin-top: 15px; text-align: left; background: #eee; padding: 10px; border-radius: 5px; font-size: 0.85rem; max-height: 150px; overflow-y: auto;}
-        .info-text { text-align: left; margin: 15px 0; font-size: 0.95rem; line-height: 1.4; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 90%; max-width: 450px; box-sizing: border-box; margin-bottom: 15px; }
+        .option-btn { background: #e0f2fe; color: var(--primary); border: 2px solid var(--primary); margin: 10px; font-size: 1.1rem; width: 85%; max-width: 300px;}
+        
+        /* Dashboard & Stats Styling */
+        .dashboard-header { width: 100%; max-width: 450px; text-align: left; margin-bottom: 15px; }
+        .scans-scroll-container { display: flex; overflow-x: auto; gap: 12px; width: 100%; max-width: 450px; padding-bottom: 10px; scrollbar-width: thin; }
+        .scan-thumbnail-card { background: white; min-width: 130px; padding: 10px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); text-align: left; flex-shrink: 0; }
+        .scan-thumbnail-card img { width: 100%; height: 90px; object-fit: cover; border-radius: 6px; }
+        
+        .stats-box { background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 100%; max-width: 450px; box-sizing: border-box; display: flex; align-items: center; justify-content: space-around; margin-top: 15px; }
+        .stat-item { text-align: left; font-size: 0.9rem; }
+        
+        /* Bottom Navigation Bar */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: white; display: flex; justify-content: space-around; padding: 12px 0; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000; }
+        .nav-item { background: none; border: none; font-size: 1.2rem; cursor: pointer; width: auto; margin: 0; padding: 0; color: #555; }
+        .nav-item.active-nav { color: var(--primary); font-weight: bold; }
+        
+        .snapshot-preview { width: 100%; max-width: 180px; height: auto; border-radius: 8px; border: 2px solid var(--primary); margin: 10px auto; display: block; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        
+        /* Report Sections Styling */
+        .results-box { text-align: left; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-top: 15px; border: 1px solid #e9ecef; }
+        .report-step { margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid #eee; }
+        .report-step:last-child { border-bottom: none; margin-bottom: 0; }
+        .report-num { color: #888; font-weight: bold; font-size: 0.85rem; margin-right: 8px; }
+        .report-title { font-size: 1.05rem; font-weight: 700; color: var(--text); }
+        .info-text { margin: 8px 0; font-size: 0.9rem; line-height: 1.45; color: #444; }
         .disclaimer-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px; font-size: 0.85rem; margin-top: 15px; text-align: left; border-radius: 4px; }
-        .results-box { text-align: left; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef; margin-top: 15px; }
     </style>
 </head>
 <body>
 
     <!-- 1. SPLASH SCREEN -->
     <div id="splash-screen" class="screen active">
-        <img src="logo.png" alt="App Logo" style="width: 150px; height: auto; margin-bottom: 20px;">
-        <p style="font-size: 1.2rem; font-weight: 500;">Advanced Screening Assistant</p>
+        <img src="logo.png" alt="SkinGuard Diagnostics Logo" style="width: 150px; height: auto; margin-bottom: 20px;">
+        <h1 style="font-size: 1.6rem; margin: 0 0 5px 0;">SkinGuard Diagnostics</h1>
+        <p style="font-size: 1rem; font-weight: 400; opacity: 0.9;">Advanced Screening Assistant</p>
     </div>
 
-    <!-- 2. ONBOARDING SCREEN -->
-    <div id="onboarding-screen" class="screen">
-        <div class="card">
-            <h2>Welcome</h2>
-            <p>Please enter your profile details</p>
+    <!-- 2. LOGIN / ONBOARDING SCREEN -->
+    <div id="login-screen" class="screen">
+        <div class="card" style="margin-top: 40px;">
+            <h2>SkinGuard Diagnostics</h2>
+            <p>Log in or save your profile details to track scans securely.</p>
             <input type="text" id="user-name" placeholder="Full Name" required>
             <select id="user-gender">
                 <option value="">Select Gender</option>
@@ -60,41 +70,60 @@
             </select>
             <input type="number" id="user-age" placeholder="Age" min="0">
             <input type="date" id="user-birthday" placeholder="Birthday">
-            <button onclick="saveProfile()">Continue</button>
+            <button onclick="saveProfile()">Save & Login</button>
         </div>
     </div>
 
-    <!-- 3. MAIN MENU OPTION SCREEN -->
+    <!-- 3. MAIN MENU / DASHBOARD SCREEN -->
     <div id="menu-screen" class="screen">
-        <h2 id="welcome-message">Hello!</h2>
-        <div id="weather-widget" style="font-size: 0.9rem; margin-bottom: 20px; color: #555;">🌤️ Checking environmental UV index...</div>
-        <p>Select an area for assessment:</p>
-        <button class="option-btn" onclick="goToOption('moles')">🟢 Skin Moles Option</button>
-        <button class="option-btn" onclick="goToOption('mouth')" style="background:#f3e8ff; color:#6b21a8; border-color:#6b21a8;">👄 Mouth Lesions Option</button>
+        <div class="dashboard-header">
+            <h2 id="welcome-message" style="margin-bottom: 5px;">Hello!</h2>
+            <div id="weather-widget" style="font-size: 0.85rem; color: #555;">🌤️ Checking environmental UV index...</div>
+        </div>
+
+        <div class="dashboard-header" style="margin-top: 10px;">
+            <h4 style="margin: 0 0 8px 0; color: #333;">Your Last Scanning</h4>
+        </div>
+        <div id="recent-scans-scroll" class="scans-scroll-container">
+            <div class="scan-thumbnail-card">
+                <div style="background:#ddd; height:90px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; color:#666;">No Scan</div>
+                <p style="margin: 6px 0 2px; font-weight:bold; font-size:0.85rem;">Scan A</p>
+                <small style="color:#777; font-size:0.75rem;">--/--/----</small>
+            </div>
+        </div>
+
+        <div class="stats-box">
+            <div style="position:relative; width: 70px; height: 70px; border-radius: 50%; background: conic-gradient(var(--primary) 0deg 270deg, #e9ecef 270deg 360deg); display: flex; align-items: center; justify-content: center;">
+                <div style="width: 54px; height: 54px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.95rem;" id="stat-total-badge">0</div>
+            </div>
+            <div class="stat-item">
+                <p style="margin: 2px 0;">📸 Photos uploaded: <b id="stat-total">0</b></p>
+                <p style="margin: 2px 0; color: var(--success);">🟢 Without problems: <b id="stat-benign">0</b></p>
+                <p style="margin: 2px 0; color: var(--danger);">🔴 Diagnosed problems: <b id="stat-high">0</b></p>
+            </div>
+        </div>
+
+        <p style="margin-top: 20px; font-weight: 500;">Select an area for assessment:</p>
+        <button class="option-btn" onclick="goToOption('moles')">🟢 Skin Moles Assessment</button>
+        <button class="option-btn" onclick="goToOption('mouth')" style="background:#f3e8ff; color:#6b21a8; border-color:#6b21a8;">👄 Mouth Lesions Assessment</button>
     </div>
 
-    <!-- 4. ABCDE QUESTIONS SCREEN (FOR MOLES) -->
+    <!-- 4. ABCDE QUESTIONS SCREEN -->
     <div id="abcde-screen" class="screen">
         <div class="card">
             <h3>ABCDE Risk Evaluation</h3>
             <p style="font-size: 0.9rem; color: #555;">Check your skin using the NHS checklist criteria:</p>
             <div style="text-align: left; margin-bottom: 15px; font-size: 0.9rem;">
-                
-                <!-- A -->
                 <div style="margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
                     <b>A - Asymmetrical:</b> Is your mole an uneven shape?<br>
                     <label><input type="radio" name="q-a" value="yes"> Yes</label> &nbsp;&nbsp;&nbsp;
                     <label><input type="radio" name="q-a" value="no" checked> No</label>
                 </div>
-
-                <!-- B -->
                 <div style="margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
                     <b>B - Border:</b> Is the edge ragged?<br>
                     <label><input type="radio" name="q-b" value="yes"> Yes</label> &nbsp;&nbsp;&nbsp;
                     <label><input type="radio" name="q-b" value="no" checked> No</label>
                 </div>
-
-                <!-- C -->
                 <div style="margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
                     <b>C - Colours:</b> Does it have different colours or changed?<br>
                     <label><input type="radio" name="q-c" value="yes" onclick="toggleColorInput(true)"> Yes</label> &nbsp;&nbsp;&nbsp;
@@ -103,21 +132,16 @@
                         <input type="text" id="q-c-text" placeholder="Type colors (e.g., black, brown, red)" style="width:100%; max-width:100%; padding: 8px; font-size: 0.9rem;">
                     </div>
                 </div>
-
-                <!-- D -->
                 <div style="margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
                     <b>D - Diameter:</b> Is it bigger than 6 millimetres?<br>
                     <label><input type="radio" name="q-d" value="yes"> Yes</label> &nbsp;&nbsp;&nbsp;
                     <label><input type="radio" name="q-d" value="no" checked> No</label>
                 </div>
-
-                <!-- E -->
                 <div style="margin-bottom: 5px;">
                     <b>E - Evolving:</b> Has it changed size, shape or colour?<br>
                     <label><input type="radio" name="q-e" value="yes"> Yes</label> &nbsp;&nbsp;&nbsp;
                     <label><input type="radio" name="q-e" value="no" checked> No</label>
                 </div>
-
             </div>
             <button onclick="startScanner()">Proceed to Scanner</button>
         </div>
@@ -136,7 +160,6 @@
                     <option value="Mixed">Mixed Red and White</option>
                     <option value="Ulcerated">Open Sore / Yellowish-White Center</option>
                 </select><br><br>
-
                 <label><b>2. Where is it located in the mouth?</b></label><br>
                 <select id="mouth-q-location" style="width:100%;">
                     <option value="Tongue">On or under the tongue</option>
@@ -144,7 +167,6 @@
                     <option value="Lips">On the lips or gums</option>
                     <option value="Palate">Roof of the mouth (palate)</option>
                 </select><br><br>
-
                 <label><b>3. How does it feel?</b></label><br>
                 <select id="mouth-q-feeling" style="width:100%;">
                     <option value="Painful">Painful, tender, or burning sensation</option>
@@ -161,24 +183,25 @@
     <div id="scanner-screen" class="screen">
         <div class="card">
             <h3 id="scanner-title">Scanner Active</h3>
-            
             <div id="webcam-container" style="background: #000; width: 200px; height: 200px; margin: 0 auto 15px; border-radius: 8px; overflow:hidden;"></div>
-            
             <button id="flash-btn" onclick="toggleFlash()" style="background:#6c757d; margin-bottom:10px;">🔦 Toggle Flashlight</button>
             <button id="scan-trigger" onclick="runAnalysis()">Analyze & Track Image</button>
-            
             <div id="result-display" class="results-box" style="display:none;"></div>
-            
-            <hr style="margin:20px 0; border:0; border-top:1px solid #ccc;">
-            <h4>Your Tracked Evolution Log:</h4>
-            <div id="history-log">No previous snapshots recorded yet.</div>
             <br>
-            <button onclick="stopAndBack()" style="background:#555;">Back to Main Menu</button>
+            <button onclick="stopAndBack()" style="background:#555;">Back to Dashboard</button>
         </div>
     </div>
 
+    <!-- BOTTOM NAVIGATION BAR -->
+    <div class="bottom-nav">
+        <button class="nav-item active-nav" onclick="changeScreen('menu-screen')">🏠</button>
+        <button class="nav-item" onclick="goToOption('moles')">🟢</button>
+        <button class="nav-item" onclick="goToOption('mouth')">👄</button>
+        <button class="nav-item" onclick="openProfileEdit()">👤</button>
+    </div>
+
     <script>
-        let userProfile = {};
+        let userProfile = JSON.parse(localStorage.getItem('userProfile')) || {};
         let scanHistory = JSON.parse(localStorage.getItem('scanHistory')) || [];
         let model, webcam;
         let activeMode = ''; 
@@ -189,81 +212,105 @@
         const MOUTH_MODEL_URL = "https://teachablemachine.withgoogle.com/models/T-1ag-a9U/"; 
 
         const diagnosisDatabase = {
-            "melanoma": {
-                desc: "Melanoma shares clinical characteristics with invasive, metastatic, or in-situ skin cancers arising from pigment-producing cells. It appears as an asymmetrical lesion with irregular borders, varied coloration, and continuous structural evolution.",
-                adv: "It is critical to seek immediate evaluation from a board-certified dermatologist. Early diagnostic biopsy and staging are vital for effective therapeutic interventions.",
-                risk: "high"
+            "melanoma": { 
+                desc: "Melanoma arises from uncontrolled melanocyte growth, exhibiting irregular borders and color shifts.", 
+                causes: "Cumulative or blistering UV radiation exposure, intense sun exposure, family history, and genetic predisposition.",
+                preventive: "Apply broad-spectrum SPF 30+ sunscreen daily, avoid peak sun hours (10 AM - 4 PM), avoid tanning beds, and conduct monthly ABCDE skin checks.",
+                risk: "high" 
             },
-            "basal cell carcinoma": {
-                desc: "Basal cell carcinoma is consistent with a common form of slow-growing, locally invasive non-melanoma skin cancer. It frequently presents as a pearly nodule, a pinkish patch, or a non-healing ulceration subject to bleeding.",
-                adv: "A formal dermatological consultation is highly important for a structural assessment. While rarely spreading distantly, surgical excision or local therapy is standard to prevent tissue destruction.",
-                risk: "high"
+            "basal cell carcinoma": { 
+                desc: "A common, slow-growing non-melanoma skin cancer presenting as a pearly nodule or non-healing ulcer.", 
+                causes: "Long-term UV radiation exposure damaging skin cell DNA, common on sun-exposed areas like face and neck.",
+                preventive: "Wear UV-blocking hats and sunglasses, apply sunscreen daily, and protect skin from repeated sunburns.",
+                risk: "high" 
             },
-            "squamous cell carcinoma": {
-                desc: "Squamous cell carcinoma shares visual properties with malignant or precancerous transformations of squamous epidermal cells. It typically resembles a firm red nodule, a rough scaly plaque, or a persistent crusted lesion.",
-                adv: "Scheduling an evaluation with a medical specialist promptly is highly recommended. Professional intervention prevents extensive local tissue damage or potential lymphatic spread.",
-                risk: "high"
+            "squamous cell carcinoma": { 
+                desc: "Skin cancer originating in epidermal squamous cells, appearing as firm red nodules or scaly crusted plaques.", 
+                causes: "Chronic UV exposure, weakened immune system, or long-term skin injuries/burn scars.",
+                preventive: "Use physical sun barriers (clothing/hats), reapply sunscreen every 2 hours, and perform regular skin assessments.",
+                risk: "high" 
             },
-            "common nevi moles": {
-                desc: "Common nevi resemble standard benign proliferation of melanocytes. They manifest as uniform, symmetrical, brown or tan spots with clearly defined borders and stable architecture over long periods.",
-                adv: "Routine skin self-examinations are sufficient for stable lesions. However, see a physician if any mark develops changes in symmetry, borders, or size over time.",
-                risk: "benign"
+            "common nevi moles": { 
+                desc: "Benign proliferation of pigment cells with stable architecture and distinct boundaries.", 
+                causes: "Natural cellular skin development, genetics, and normal sun exposure during childhood/youth.",
+                preventive: "Monitor stable moles regularly for evolving features (ABCDE checks) and wear SPF when outdoors.",
+                risk: "benign" 
             },
-            "Seborrheic Keratoses (Benign)": {
-                desc: "Seborrheic keratosis appears consistent with a non-cancerous, superficial epidermal growth. It features a characteristic 'stuck-on', waxy, or hyperkeratotic appearance, varying from light tan to black.",
-                adv: "No immediate medical treatment is necessary as these are harmless. Consultation is suggested only if the growth undergoes irritation, catches on clothing, or exhibits diagnostic ambiguity.",
-                risk: "benign"
+            "Seborrheic Keratoses (Benign)": { 
+                desc: "Harmless, non-cancerous skin growth featuring a waxy, 'stuck-on' raised appearance.", 
+                causes: "Natural skin aging and genetic factors. Not linked to UV damage or infection.",
+                preventive: "No prevention required as they are harmless; avoid picking or scratching them to prevent irritation.",
+                risk: "benign" 
             },
-            "Dermatofibromas (Benign)": {
-                desc: "Dermatofibroma is consistent with a benign, firm, fibrous skin nodule often found on limbs. It characteristically exhibits a positive 'dimple sign' when pinched laterally and ranges from brown to pinkish-purple.",
-                adv: "Clinical monitoring is generally adequate as these lesions are completely benign. Seek professional verification if the area experiences sudden growth, pain, or atypical color changes.",
-                risk: "benign"
+            "Dermatofibromas (Benign)": { 
+                desc: "Firm, harmless fibrous nodules frequently occurring on arms and legs.", 
+                causes: "Minor skin trauma, such as insect bites, minor scrapes, or ingrown hairs.",
+                preventive: "Avoid scratching or picking at minor skin injuries or insect bites.",
+                risk: "benign" 
             },
-            "Hemangioma (Benign)": {
-                desc: "Hemangioma resembles a benign vascular lesion composed of abnormally dense blood vessels. It presents as a bright red to deep purple superficial papule or deeper soft tissue swelling.",
-                adv: "No urgent dermatological care is required for asymptomatic, stable hemangiomas. An expert evaluation is appropriate if bleeding occurs, or if structural changes cause functional discomfort.",
-                risk: "benign"
+            "Hemangioma (Benign)": { 
+                desc: "Benign vascular growth consisting of densely packed blood vessels.", 
+                causes: "Abnormal proliferation of blood vessel endothelial cells.",
+                preventive: "No lifestyle prevention needed; protect from physical trauma to avoid bleeding.",
+                risk: "benign" 
             },
 
             // Mouth Lesions Categories
-            "oral Squamous Cell Carcinoma(Malignant & Pre-Cancerous)": {
-                desc: "Oral squamous cell carcinoma shares characteristics with primary malignant mucosal transformations. It exhibits patterns of an indurated, firm ulceration, a persistent exophytic growth, or irregular tissue friability.",
-                adv: "Immediate referral to an oral surgeon, ENT specialist, or dermatologist is critically important. Rapid tissue biopsy is essential to guide appropriate surgical or oncological strategies.",
-                risk: "high"
+            "oral Squamous Cell Carcinoma(Malignant & Pre-Cancerous)": { 
+                desc: "Primary malignant transformation of oral mucosal tissues.", 
+                causes: "Heavy tobacco use, chronic alcohol consumption, HPV infection, or prolonged mechanical friction.",
+                preventive: "Avoid all tobacco products, limit alcohol intake, maintain high oral hygiene, and get routine dental exams.",
+                risk: "high" 
             },
-            "Erythroplakia (Malignant & Pre-Cancerous)": {
-                desc: "Oral erythroplakia is consistent with a highly suspicious, fiery red mucosal patch that cannot be characterized clinically or pathologically as any other defining condition. It holds a very high rate of dysplasia.",
-                adv: "A prompt, comprehensive clinical assessment by a healthcare specialist is highly important. Diagnostic tissue mapping and biopsy are required due to the elevated risk of pre-malignancy.",
-                risk: "high"
+            "Erythroplakia (Malignant & Pre-Cancerous)": { 
+                desc: "Fiery red mucosal patch with high dysplasia risk requiring immediate review.", 
+                causes: "Chronic irritation from tobacco, heavy alcohol use, or ill-fitting dental prosthetics.",
+                preventive: "Quit smoking/chewing tobacco, minimize alcohol use, and fix rough dental appliances.",
+                risk: "high" 
             },
-            "Leukoplakia (Non-Homogenous)(Malignant)": {
-                desc: "Non-homogenous leukoplakia resembles a white or mixed red-and-white mucosal plaque with an irregular, nodular, verrucous, or speckled topography, showing high associations with advanced cellular dysplasia.",
-                adv: "Arranging an evaluation with an oral specialist or dermatologist without delay is vital. Advanced clinical diagnostic monitoring or definitive excision is typically indicated.",
-                risk: "high"
+            "Leukoplakia (Non-Homogenous)(Malignant)": { 
+                desc: "Irregular white or speckled oral plaque associated with cellular changes.", 
+                causes: "Chronic tissue irritation from smoking, chewing tobacco, or constant friction.",
+                preventive: "Eliminate tobacco usage, reduce alcohol consumption, and maintain consistent dental checkups.",
+                risk: "high" 
             },
-            "Aphthous Ulcers (Canker Sores)(Benign)": {
-                desc: "Aphthous ulcers share characteristics with common, self-limiting inflammatory oral conditions. They appear as painful, shallow, round or oval ulcerations featuring a yellowish-white pseudomembranous center and a distinct red halo.",
-                adv: "Lesions typically resolve spontaneously within 7 to 14 days. If the ulcer persists beyond three weeks, grows exceptionally large, or prevents fluid intake, consult a healthcare provider.",
-                risk: "benign"
+            "Aphthous Ulcers (Canker Sores)(Benign)": { 
+                desc: "Self-limiting, painful shallow oral sores with red halos.", 
+                causes: "Stress, minor oral injury, acidic foods, or minor vitamin deficiencies (B12, iron).",
+                preventive: "Avoid trigger foods (spicy/acidic), use SLS-free toothpaste, maintain good oral hygiene, and manage stress.",
+                risk: "benign" 
             },
-            "Herpetic Lesions (Cold Sores)(Benign)": {
-                desc: "Herpetic lesions resemble localized viral flare-ups characterized by clusters of small, fluid-filled vesicles on mucosal borders. These vesicles rupture to form shallow, painful, crusted erosions.",
-                adv: "Managing symptoms with standard topical or oral supportive care is generally sufficient. Seek a professional prescription if outbreaks are frequent, exceptionally widespread, or fail to heal normally.",
-                risk: "benign"
+            "Herpetic Lesions (Cold Sores)(Benign)": { 
+                desc: "Fluid-filled viral vesicles on mucosal borders that crust over.", 
+                causes: "Herpes Simplex Virus (HSV-1) reactivation triggered by fatigue, stress, or sun exposure.",
+                preventive: "Use lip balm with SPF, manage stress, avoid sharing personal items, and apply antiviral cream at early tingling.",
+                risk: "benign" 
             },
-            "Traumatic Ulcers(Benign)": {
-                desc: "Traumatic ulcers appear consistent with localized mechanical, thermal, or chemical mucosal injury. They display a distinct surface erosion directly correlating to an identifiable source of chronic physical irritation.",
-                adv: "The sore should improve rapidly once the physical cause (such as a sharp tooth or appliance) is removed. If no healing is observed within two weeks of resolving the trauma, a specialist review is needed.",
-                risk: "benign"
+            "Traumatic Ulcers(Benign)": { 
+                desc: "Oral tissue erosion caused by physical, thermal, or chemical irritation.", 
+                causes: "Accidental cheek bites, sharp teeth, rough dental appliances, or hot foods.",
+                preventive: "Chew food carefully, consult a dentist to smooth sharp teeth or adjust braces, and avoid burning hot foods.",
+                risk: "benign" 
             },
-            "Oral Thrush (Candidiasis)(Benign)": {
-                desc: "Oral thrush resembles a superficial fungal candidiasis overgrowth. It characteristically presents as soft, creamy-white patches on the oral mucosa that can be scraped away, leaving a raw, erythematous base.",
-                adv: "A consultation with a doctor or dentist is recommended to confirm the fungal origin. Standard localized or systemic antifungal therapies successfully eliminate the underlying infection.",
-                risk: "benign"
+            "Oral Thrush (Candidiasis)(Benign)": { 
+                desc: "Superficial fungal overgrowth appearing as wipeable creamy white patches.", 
+                causes: "Candida fungus overgrowth due to antibiotic use, dry mouth, steroid inhalers, or reduced immunity.",
+                preventive: "Rinse mouth after using steroid inhalers, maintain thorough dental hygiene, and treat dry mouth.",
+                risk: "benign" 
             }
         };
 
-        setTimeout(() => { changeScreen('onboarding-screen'); }, 2500);
+        // Splash screen initialization check
+        setTimeout(() => { 
+            if(!userProfile.name) {
+                changeScreen('login-screen');
+            } else {
+                document.getElementById('welcome-message').innerText = `Hello, ${userProfile.name}!`;
+                fetchWeatherAlert();
+                updateDashboardStats();
+                changeScreen('menu-screen');
+            }
+        }, 2000);
 
         function changeScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -275,16 +322,28 @@
             userProfile.gender = document.getElementById('user-gender').value;
             userProfile.age = document.getElementById('user-age').value;
             userProfile.birthday = document.getElementById('user-birthday').value;
-        
-            if(!userProfile.name) { alert("Please complete the profile forms first."); return; }
+
+            if(!userProfile.name) { alert("Please enter your name to continue."); return; }
             
+            localStorage.setItem('userProfile', JSON.stringify(userProfile));
             document.getElementById('welcome-message').innerText = `Hello, ${userProfile.name}!`;
             fetchWeatherAlert();
+            updateDashboardStats();
             changeScreen('menu-screen');
         }
 
+        function openProfileEdit() {
+            if(userProfile.name) {
+                document.getElementById('user-name').value = userProfile.name || '';
+                document.getElementById('user-gender').value = userProfile.gender || '';
+                document.getElementById('user-age').value = userProfile.age || '';
+                document.getElementById('user-birthday').value = userProfile.birthday || '';
+            }
+            changeScreen('login-screen');
+        }
+
         function fetchWeatherAlert() {
-            document.getElementById('weather-widget').innerHTML = "☀️ <b>UV Index Update:</b> High UV levels observed in your area today. Ensure proper sun protection and monitor active changes.";
+            document.getElementById('weather-widget').innerHTML = "☀️ <b>UV Index Update:</b> High UV levels observed in your area today. Ensure proper sun protection.";
         }
 
         function goToOption(mode) {
@@ -299,16 +358,13 @@
 
         async function startScanner() {
             if (webcam) {
-                try {
-                    await webcam.stop();
-                } catch(e) {}
+                try { await webcam.stop(); } catch(e) {}
                 webcam = null;
             }
 
             changeScreen('scanner-screen');
             document.getElementById('scanner-title').innerText = activeMode === 'moles' ? "Mole Scanner Active" : "Mouth Lesion Scanner Active";
             document.getElementById('result-display').style.display = "none";
-            updateHistoryUI();
 
             try {
                 const targetModelURL = activeMode === 'moles' ? MOLE_MODEL_URL : MOUTH_MODEL_URL;
@@ -318,18 +374,16 @@
                 await webcam.setup({ facingMode: "environment" }); 
                 await webcam.play();
                 
-                if (webcam.stream) {
-                    trackStream = webcam.stream.getVideoTracks();
-                }
+                if (webcam.stream) { trackStream = webcam.stream.getVideoTracks(); }
                 
                 document.getElementById("webcam-container").innerHTML = "";
                 document.getElementById("webcam-container").appendChild(webcam.canvas);
                 document.getElementById('result-display').style.display = "block";
-                document.getElementById('result-display').innerText = "Camera streams synchronized. Position the camera and illuminate cleanly.";
+                document.getElementById('result-display').innerText = "Camera synchronized. Position subject and analyze.";
                 window.requestAnimationFrame(loop);
             } catch(e) {
                 document.getElementById('result-display').style.display = "block";
-                document.getElementById('result-display').innerText = "Camera hardware synchronization error. Please verify URL variables or device configurations.";
+                document.getElementById('result-display').innerText = "Camera synchronization error. Please verify setup.";
             }
         }
 
@@ -341,42 +395,21 @@
         }
 
         async function toggleFlash() {
-            if (!webcam || !webcam.webcam) {
-                alert("Camera is not active yet.");
-                return;
-            }
-
+            if (!webcam || !webcam.webcam) { alert("Camera not active."); return; }
             try {
                 const stream = webcam.webcam.srcObject;
-                if (!stream) {
-                    alert("No active camera stream detected.");
-                    return;
-                }
-
                 const videoTrack = stream.getVideoTracks()[0];
                 const capabilities = videoTrack.getCapabilities ? videoTrack.getCapabilities() : {};
-
-                if (!capabilities.torch) {
-                    alert("Flashlight/Torch hardware is not supported or accessible on this browser/device.");
-                    return;
-                }
-
+                if (!capabilities.torch) { alert("Flashlight not supported on this device."); return; }
                 flashOn = !flashOn;
-                await videoTrack.applyConstraints({
-                    advanced: [{ torch: flashOn }]
-                });
-
+                await videoTrack.applyConstraints({ advanced: [{ torch: flashOn }] });
                 document.getElementById('flash-btn').style.background = flashOn ? '#d90429' : '#6c757d';
-                document.getElementById('flash-btn').innerText = flashOn ? "🔦 Turn Off Flash" : "🔦 Toggle Flashlight";
-
-            } catch (err) {
-                alert("Unable to toggle device flashlight: " + err.message);
-            }
+                document.getElementById('flash-btn').innerText = flashOn ? "🔦 Flash ON" : "🔦 Toggle Flashlight";
+            } catch (err) { alert("Torch error: " + err.message); }
         }
         
         async function runAnalysis() {
             let userReportData = "";
-            
             if(activeMode === 'moles') {
                 let score = 0;
                 const aVal = document.querySelector('input[name="q-a"]:checked')?.value || 'no';
@@ -393,12 +426,12 @@
                 if(eVal === 'yes') score++;
 
                 let colorDetails = (cVal === 'yes' && cText) ? ` [Colors: ${cText}]` : '';
-                userReportData = `ABCDE Flags: ${score}/5 (A:${aVal}, B:${bVal}, C:${cVal}${colorDetails}, D:${dVal}, E:${eVal})`;
+                userReportData = `ABCDE Flags: ${score}/5`;
             } else {
                 const col = document.getElementById('mouth-q-color').value;
                 const loc = document.getElementById('mouth-q-location').value;
                 const feel = document.getElementById('mouth-q-feeling').value;
-                userReportData = `Survey Context: ${col} patch found on the ${loc} feeling ${feel}.`;
+                userReportData = `Survey: ${col} patch on ${loc} (${feel})`;
             }
 
             let topPrediction = ""; 
@@ -424,10 +457,11 @@
                 capturedImageData = snapCanvas.toDataURL('image/png');
             }
 
-            let infoObj = diagnosisDatabase[topPrediction] || {
-                desc: "The scanned visual target exhibits unique structural characteristics matching custom training dataset entries.",
-                adv: "Consult with a medical professional to review this specific visual structure formally.",
-                risk: "benign"
+            let infoObj = diagnosisDatabase[topPrediction] || { 
+                desc: "The scanned visual target exhibits unique structural characteristics.", 
+                causes: "Varies depending on skin type, exposure, and genetic factors.",
+                preventive: "Maintain routine self-examinations and consult a dermatologist.",
+                risk: "benign" 
             };
 
             const logEntry = {
@@ -436,64 +470,90 @@
                 time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
                 notes: userReportData,
                 finding: `${topPrediction} (${confidence})`,
+                risk: infoObj.risk,
                 image: capturedImageData
             };
 
             scanHistory.unshift(logEntry);
             localStorage.setItem('scanHistory', JSON.stringify(scanHistory));
+            updateDashboardStats();
             
             const accentColor = infoObj.risk === 'high' ? 'var(--danger)' : 'var(--success)';
             
             document.getElementById('result-display').innerHTML = `
-                <h3 style="color:${accentColor}; margin-top:0;">Assessment: ${topPrediction} (${confidence})</h3>
-                ${capturedImageData ? `<img src="${capturedImageData}" class="snapshot-preview" alt="Analyzed Target Snapshot">` : ''}
-                <p style="font-size:0.85rem; color:#666; margin: 5px 0 10px;">${userReportData}</p>
-                <div class="info-text"><b>Description:</b> ${infoObj.desc}</div>
-                <div class="info-text"><b>Guidance:</b> ${infoObj.adv}</div>
+                ${capturedImageData ? `<img src="${capturedImageData}" class="snapshot-preview" alt="Snapshot">` : ''}
+                
+                <!-- 01 Your Result -->
+                <div class="report-step">
+                    <span class="report-num">01</span><span class="report-title">Your Result</span>
+                    <h3 style="color:${accentColor}; margin: 6px 0 2px;">${topPrediction} (${confidence})</h3>
+                    <p style="font-size:0.85rem; color:#666; margin: 0;">${userReportData}</p>
+                </div>
+
+                <!-- 02 What is it? -->
+                <div class="report-step">
+                    <span class="report-num">02</span><span class="report-title">What is it?</span>
+                    <p class="info-text">${infoObj.desc}</p>
+                </div>
+
+                <!-- 03 Causes -->
+                <div class="report-step">
+                    <span class="report-num">03</span><span class="report-title">Causes</span>
+                    <p class="info-text">${infoObj.causes}</p>
+                </div>
+
+                <!-- 04 Preventive Measures -->
+                <div class="report-step">
+                    <span class="report-num">04</span><span class="report-title">Preventive Measures</span>
+                    <p class="info-text">${infoObj.preventive}</p>
+                </div>
+
                 <div class="disclaimer-box">
                     ⚠️ <b>AI Limitation Notification:</b> This machine learning output serves as an educational, preliminary screening helper; it does not substitute for a professional clinical diagnosis.
                 </div>
             `;
-            
             document.getElementById('result-display').style.display = 'block';
-            updateHistoryUI();
         }
 
-        function updateHistoryUI() {
-            const container = document.getElementById('history-log');
-            const targetType = activeMode === 'moles' ? "Skin Mole" : "Mouth Lesion";
-            const filtered = scanHistory.filter(h => h.type === targetType);
-            
-            if(filtered.length === 0) {
-                container.innerHTML = "No historical tracking snapshots saved for this category.";
+        function updateDashboardStats() {
+            const totalScans = scanHistory.length;
+            const benignCount = scanHistory.filter(h => h.risk === 'benign').length;
+            const highCount = scanHistory.filter(h => h.risk === 'high').length;
+
+            document.getElementById('stat-total').innerText = totalScans;
+            document.getElementById('stat-total-badge').innerText = totalScans;
+            document.getElementById('stat-benign').innerText = benignCount;
+            document.getElementById('stat-high').innerText = highCount;
+
+            const scrollContainer = document.getElementById('recent-scans-scroll');
+            if(totalScans === 0) {
+                scrollContainer.innerHTML = `
+                    <div class="scan-thumbnail-card">
+                        <div style="background:#eee; height:90px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.7rem; color:#777;">No Scans</div>
+                        <p style="margin: 6px 0 2px; font-weight:bold; font-size:0.8rem;">No Scan</p>
+                        <small style="color:#777; font-size:0.7rem;">--/--/----</small>
+                    </div>`;
                 return;
             }
-            
-            container.innerHTML = filtered.map(entry => `
-                <div style="border-bottom:1px solid #ccc; padding: 8px 0; display: flex; align-items: center; gap: 10px;">
-                    ${entry.image ? `<img src="${entry.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">` : ''}
-                    <div>
-                        📅 <b>${entry.date} at ${entry.time}</b><br>
-                        ↳ Result: <span style="font-weight:bold;">${entry.finding}</span><br>
-                        <small style="color:#666;">${entry.notes}</small>
-                    </div>
+
+            scrollContainer.innerHTML = scanHistory.slice(0, 5).map((entry, index) => `
+                <div class="scan-thumbnail-card">
+                    ${entry.image ? `<img src="${entry.image}">` : `<div style="background:#ddd; height:90px; border-radius:6px;"></div>`}
+                    <p style="margin: 6px 0 2px; font-weight:bold; font-size:0.8rem;">Scan ${String.fromCharCode(65 + index)}</p>
+                    <small style="color:#777; font-size:0.7rem;">${entry.date}</small>
                 </div>
             `).join('');
         }
 
         async function stopAndBack() {
             if (webcam) {
-                try {
-                    if(flashOn) { toggleFlash(); }
-                    await webcam.stop();
-                } catch(e){}
-                webcam = null;
-                trackStream = null;
+                try { if(flashOn) { toggleFlash(); } await webcam.stop(); } catch(e){}
+                webcam = null; trackStream = null;
             }
             document.getElementById("webcam-container").innerHTML = "";
+            updateDashboardStats();
             changeScreen('menu-screen');
         }
     </script>
 </body>
 </html>
-        
