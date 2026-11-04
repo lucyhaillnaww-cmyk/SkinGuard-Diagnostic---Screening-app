@@ -5,39 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkinGuard Diagnostics</title>
     <link rel="manifest" href="manifest.json">
-        <!-- TensorFlow & Teachable Machine Libraries -->
+    <!-- TensorFlow & Teachable Machine Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>  
     
     <style>
-    :root { --bg: #f4f7f6; --primary: #2a6f97; --text: #2c3e50; --danger: #d90429; --success: #2b9348;}
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; background: var(--bg); color: var(--text); }
-    .screen { display: none; min-height: 100vh; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; text-align: center; }
-    .active { display: flex; }
-    
-    /* Styling for captured mole snapshot thumbnail */
-.snapshot-preview {
-    width: 100%;
-    max-width: 180px;
-    height: auto;
-    border-radius: 8px;
-    border: 2px solid var(--primary);
-    margin: 10px auto;
-    display: block;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-    .snapshot-preview { width: 100%; max-width: 180px; height: auto; border-radius: 8px; border: 2px solid var(--primary); margin: 10px auto; display: block; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        :root { --bg: #f4f7f6; --primary: #2a6f97; --text: #2c3e50; --danger: #d90429; --success: #2b9348;}
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; background: var(--bg); color: var(--text); }
+        .screen { display: none; min-height: 100vh; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box; text-align: center; }
+        .active { display: flex; }
+        
+        /* Styling for captured mole snapshot thumbnail */
+        .snapshot-preview {
+            width: 100%;
+            max-width: 180px;
+            height: auto;
+            border-radius: 8px;
+            border: 2px solid var(--primary);
+            margin: 10px auto;
+            display: block;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
 
-    #splash-screen { background: var(--primary); color: white; transition: opacity 0.5s ease; }
-    input, select, button { padding: 12px; margin: 8px 0; width: 85%; max-width: 300px; border-radius: 8px; border: 1px solid #ccc; font-size: 1rem; box-sizing: border-box; }
-    button { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; }
-    .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 90%; max-width: 450px; box-sizing: border-box; }
-    .option-btn { background: #e0f2fe; color: var(--primary); border: 2px solid var(--primary); margin: 10px; font-size: 1.2rem; width: 85%; max-width: 300px;}
-    #history-log { margin-top: 15px; text-align: left; background: #eee; padding: 10px; border-radius: 5px; font-size: 0.85rem; max-height: 150px; overflow-y: auto;}
-    .info-text { text-align: left; margin: 15px 0; font-size: 0.95rem; line-height: 1.4; }
-    .disclaimer-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px; font-size: 0.85rem; margin-top: 15px; text-align: left; border-radius: 4px; }
-    .results-box { text-align: left; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef; margin-top: 15px; }
-</style>
+        #splash-screen { background: var(--primary); color: white; transition: opacity 0.5s ease; }
+        input, select, button { padding: 12px; margin: 8px 0; width: 85%; max-width: 300px; border-radius: 8px; border: 1px solid #ccc; font-size: 1rem; box-sizing: border-box; }
+        button { background: var(--primary); color: white; border: none; font-weight: bold; cursor: pointer; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 90%; max-width: 450px; box-sizing: border-box; }
+        .option-btn { background: #e0f2fe; color: var(--primary); border: 2px solid var(--primary); margin: 10px; font-size: 1.2rem; width: 85%; max-width: 300px;}
+        #history-log { margin-top: 15px; text-align: left; background: #eee; padding: 10px; border-radius: 5px; font-size: 0.85rem; max-height: 150px; overflow-y: auto;}
+        .info-text { text-align: left; margin: 15px 0; font-size: 0.95rem; line-height: 1.4; }
+        .disclaimer-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 10px; font-size: 0.85rem; margin-top: 15px; text-align: left; border-radius: 4px; }
+        .results-box { text-align: left; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef; margin-top: 15px; }
+    </style>
 </head>
 <body>
 
@@ -78,26 +77,26 @@
     <div id="abcde-screen" class="screen">
         <div class="card">
             <h3>ABCDE Risk Evaluation</h3>
-            <p style="font-size: 0.9rem; color: #555;">Check your skin using the NHS checklist criteria[cite: 1]:</p>
+            <p style="font-size: 0.9rem; color: #555;">Check your skin using the NHS checklist criteria:</p>
             <div style="text-align: left; margin-bottom: 15px; font-size: 0.9rem;">
                 
                 <!-- A -->
                 <div style="margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-                    <b>A - Asymmetrical:</b> Is your mole an uneven shape[cite: 1]?<br>
+                    <b>A - Asymmetrical:</b> Is your mole an uneven shape?<br>
                     <label><input type="radio" name="q-a" value="yes"> Yes</label> &nbsp;&nbsp;&nbsp;
                     <label><input type="radio" name="q-a" value="no" checked> No</label>
                 </div>
 
                 <!-- B -->
                 <div style="margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-                    <b>B - Border:</b> Is the edge ragged[cite: 1]?<br>
+                    <b>B - Border:</b> Is the edge ragged?<br>
                     <label><input type="radio" name="q-b" value="yes"> Yes</label> &nbsp;&nbsp;&nbsp;
                     <label><input type="radio" name="q-b" value="no" checked> No</label>
                 </div>
 
                 <!-- C -->
                 <div style="margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-                    <b>C - Colours:</b> Does it have different colours or changed[cite: 1]?<br>
+                    <b>C - Colours:</b> Does it have different colours or changed?<br>
                     <label><input type="radio" name="q-c" value="yes" onclick="toggleColorInput(true)"> Yes</label> &nbsp;&nbsp;&nbsp;
                     <label><input type="radio" name="q-c" value="no" checked onclick="toggleColorInput(false)"> No</label>
                     <div id="color-input-container" style="display:none; margin-top: 8px;">
@@ -107,14 +106,14 @@
 
                 <!-- D -->
                 <div style="margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
-                    <b>D - Diameter:</b> Is it bigger than 6 millimetres[cite: 1]?<br>
+                    <b>D - Diameter:</b> Is it bigger than 6 millimetres?<br>
                     <label><input type="radio" name="q-d" value="yes"> Yes</label> &nbsp;&nbsp;&nbsp;
                     <label><input type="radio" name="q-d" value="no" checked> No</label>
                 </div>
 
                 <!-- E -->
                 <div style="margin-bottom: 5px;">
-                    <b>E - Evolving:</b> Has it changed size, shape or colour[cite: 1]?<br>
+                    <b>E - Evolving:</b> Has it changed size, shape or colour?<br>
                     <label><input type="radio" name="q-e" value="yes"> Yes</label> &nbsp;&nbsp;&nbsp;
                     <label><input type="radio" name="q-e" value="no" checked> No</label>
                 </div>
@@ -275,6 +274,7 @@
             userProfile.name = document.getElementById('user-name').value;
             userProfile.gender = document.getElementById('user-gender').value;
             userProfile.age = document.getElementById('user-age').value;
+            userProfile.birthday = document.getElementById('user-birthday').value;
         
             if(!userProfile.name) { alert("Please complete the profile forms first."); return; }
             
@@ -293,42 +293,45 @@
             else { changeScreen('mouth-survey-screen'); }
         }
 
-        async function startScanner() {
-            // 1. Clean up any existing active webcam session first
-    if (webcam) {
-        try {
-            await webcam.stop();
-        } catch(e) {}
-        webcam = null;
-    }
-
-    changeScreen('scanner-screen');
-    document.getElementById('scanner-title').innerText = activeMode === 'moles' ? "Mole Scanner Active" : "Mouth Lesion Scanner Active";
-    document.getElementById('result-display').style.display = "none";
-    updateHistoryUI();
-
-    try {
-        const targetModelURL = activeMode === 'moles' ? MOLE_MODEL_URL : MOUTH_MODEL_URL;
-        model = await tmImage.load(targetModelURL + "model.json", targetModelURL + "metadata.json");
-        
-        webcam = new tmImage.Webcam(200, 200, true); 
-        await webcam.setup({ facingMode: "environment" }); 
-        await webcam.play();
-        
-        if (webcam.stream) {
-            trackStream = webcam.stream.getVideoTracks();
+        function toggleColorInput(show) {
+            document.getElementById('color-input-container').style.display = show ? 'block' : 'none';
         }
-        
-        document.getElementById("webcam-container").innerHTML = "";
-        document.getElementById("webcam-container").appendChild(webcam.canvas);
-        document.getElementById('result-display').style.display = "block";
-        document.getElementById('result-display').innerText = "Camera streams synchronized. Position the camera and illuminate cleanly.";
-        window.requestAnimationFrame(loop);
-    } catch(e) {
-        document.getElementById('result-display').style.display = "block";
-        document.getElementById('result-display').innerText = "Camera hardware synchronization error. Please verify URL variables or device configurations.";
-    }
-}
+
+        async function startScanner() {
+            if (webcam) {
+                try {
+                    await webcam.stop();
+                } catch(e) {}
+                webcam = null;
+            }
+
+            changeScreen('scanner-screen');
+            document.getElementById('scanner-title').innerText = activeMode === 'moles' ? "Mole Scanner Active" : "Mouth Lesion Scanner Active";
+            document.getElementById('result-display').style.display = "none";
+            updateHistoryUI();
+
+            try {
+                const targetModelURL = activeMode === 'moles' ? MOLE_MODEL_URL : MOUTH_MODEL_URL;
+                model = await tmImage.load(targetModelURL + "model.json", targetModelURL + "metadata.json");
+                
+                webcam = new tmImage.Webcam(200, 200, true); 
+                await webcam.setup({ facingMode: "environment" }); 
+                await webcam.play();
+                
+                if (webcam.stream) {
+                    trackStream = webcam.stream.getVideoTracks();
+                }
+                
+                document.getElementById("webcam-container").innerHTML = "";
+                document.getElementById("webcam-container").appendChild(webcam.canvas);
+                document.getElementById('result-display').style.display = "block";
+                document.getElementById('result-display').innerText = "Camera streams synchronized. Position the camera and illuminate cleanly.";
+                window.requestAnimationFrame(loop);
+            } catch(e) {
+                document.getElementById('result-display').style.display = "block";
+                document.getElementById('result-display').innerText = "Camera hardware synchronization error. Please verify URL variables or device configurations.";
+            }
+        }
 
         async function loop() {
             if(webcam && webcam.canvas) {
@@ -338,147 +341,145 @@
         }
 
         async function toggleFlash() {
-    if (!webcam || !webcam.webcam) {
-        alert("Camera is not active yet.");
-        return;
-    }
+            if (!webcam || !webcam.webcam) {
+                alert("Camera is not active yet.");
+                return;
+            }
 
-    try {
-        // Access native HTML5 video stream track directly from Teachable Machine
-        const stream = webcam.webcam.srcObject;
-        if (!stream) {
-            alert("No active camera stream detected.");
-            return;
-        }
+            try {
+                const stream = webcam.webcam.srcObject;
+                if (!stream) {
+                    alert("No active camera stream detected.");
+                    return;
+                }
 
-        const videoTrack = stream.getVideoTracks()[0];
-        const capabilities = videoTrack.getCapabilities ? videoTrack.getCapabilities() : {};
+                const videoTrack = stream.getVideoTracks()[0];
+                const capabilities = videoTrack.getCapabilities ? videoTrack.getCapabilities() : {};
 
-        // Check if device supports torch/flashlight
-        if (!capabilities.torch) {
-            alert("Flashlight/Torch hardware is not supported or accessible on this browser/device.");
-            return;
-        }
+                if (!capabilities.torch) {
+                    alert("Flashlight/Torch hardware is not supported or accessible on this browser/device.");
+                    return;
+                }
 
-        flashOn = !flashOn;
-        await videoTrack.applyConstraints({
-            advanced: [{ torch: flashOn }]
-        });
+                flashOn = !flashOn;
+                await videoTrack.applyConstraints({
+                    advanced: [{ torch: flashOn }]
+                });
 
-        document.getElementById('flash-btn').style.background = flashOn ? '#d90429' : '#6c757d';
-        document.getElementById('flash-btn').innerText = flashOn ? "🔦 Turn Off Flash" : "🔦 Toggle Flashlight";
+                document.getElementById('flash-btn').style.background = flashOn ? '#d90429' : '#6c757d';
+                document.getElementById('flash-btn').innerText = flashOn ? "🔦 Turn Off Flash" : "🔦 Toggle Flashlight";
 
-    } catch (err) {
-        alert("Unable to toggle device flashlight: " + err.message);
-    }
-}
-    
-    if(activeMode === 'moles') {
-        let score = 0;
-        const aVal = document.querySelector('input[name="q-a"]:checked')?.value || 'no';
-        const bVal = document.querySelector('input[name="q-b"]:checked')?.value || 'no';
-        const cVal = document.querySelector('input[name="q-c"]:checked')?.value || 'no';
-        const cText = document.getElementById('q-c-text').value.trim();
-        const dVal = document.querySelector('input[name="q-d"]:checked')?.value || 'no';
-        const eVal = document.querySelector('input[name="q-e"]:checked')?.value || 'no';
-
-        if(aVal === 'yes') score++;
-        if(bVal === 'yes') score++;
-        if(cVal === 'yes') score++;
-        if(dVal === 'yes') score++;
-        if(eVal === 'yes') score++;
-
-        let colorDetails = (cVal === 'yes' && cText) ? ` [Colors: ${cText}]` : '';
-        userReportData = `ABCDE Flags: ${score}/5 (A:${aVal}, B:${bVal}, C:${cVal}${colorDetails}, D:${dVal}, E:${eVal})`;
-    } else {
-        const col = document.getElementById('mouth-q-color').value;
-        const loc = document.getElementById('mouth-q-location').value;
-        const feel = document.getElementById('mouth-q-feeling').value;
-        userReportData = `Survey Context: ${col} patch found on the ${loc} feeling ${feel}.`;
-    }
-
-    let topPrediction = ""; 
-    let confidence = "0%";
-    let capturedImageData = "";
-
-    if (model && webcam) {
-        // 1. Run Machine Learning Prediction
-        const prediction = await model.predict(webcam.canvas);
-        let highestProb = 0;
-        for (let i = 0; i < model.getTotalClasses(); i++) {
-            if(prediction[i].probability > highestProb) {
-                highestProb = prediction[i].probability;
-                topPrediction = prediction[i].className;
-                confidence = (highestProb * 100).toFixed(0) + "%";
+            } catch (err) {
+                alert("Unable to toggle device flashlight: " + err.message);
             }
         }
+        
+        async function runAnalysis() {
+            let userReportData = "";
+            
+            if(activeMode === 'moles') {
+                let score = 0;
+                const aVal = document.querySelector('input[name="q-a"]:checked')?.value || 'no';
+                const bVal = document.querySelector('input[name="q-b"]:checked')?.value || 'no';
+                const cVal = document.querySelector('input[name="q-c"]:checked')?.value || 'no';
+                const cText = document.getElementById('q-c-text').value.trim();
+                const dVal = document.querySelector('input[name="q-d"]:checked')?.value || 'no';
+                const eVal = document.querySelector('input[name="q-e"]:checked')?.value || 'no';
 
-        // 2. Capture Snapshot Image from active canvas frame
-        const snapCanvas = document.createElement('canvas');
-        snapCanvas.width = webcam.canvas.width;
-        snapCanvas.height = webcam.canvas.height;
-        const ctx = snapCanvas.getContext('2d');
-        ctx.drawImage(webcam.canvas, 0, 0, snapCanvas.width, snapCanvas.height);
-        capturedImageData = snapCanvas.toDataURL('image/png');
-    }
+                if(aVal === 'yes') score++;
+                if(bVal === 'yes') score++;
+                if(cVal === 'yes') score++;
+                if(dVal === 'yes') score++;
+                if(eVal === 'yes') score++;
 
-    let infoObj = diagnosisDatabase[topPrediction] || {
-        desc: "The scanned visual target exhibits unique structural characteristics matching custom training dataset entries.",
-        adv: "Consult with a medical professional to review this specific visual structure formally.",
-        risk: "benign"
-    };
+                let colorDetails = (cVal === 'yes' && cText) ? ` [Colors: ${cText}]` : '';
+                userReportData = `ABCDE Flags: ${score}/5 (A:${aVal}, B:${bVal}, C:${cVal}${colorDetails}, D:${dVal}, E:${eVal})`;
+            } else {
+                const col = document.getElementById('mouth-q-color').value;
+                const loc = document.getElementById('mouth-q-location').value;
+                const feel = document.getElementById('mouth-q-feeling').value;
+                userReportData = `Survey Context: ${col} patch found on the ${loc} feeling ${feel}.`;
+            }
 
-    const logEntry = {
-        type: activeMode === 'moles' ? "Skin Mole" : "Mouth Lesion",
-        date: new Date().toLocaleDateString(),
-        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-        notes: userReportData,
-        finding: `${topPrediction} (${confidence})`,
-        image: capturedImageData
-    };
+            let topPrediction = ""; 
+            let confidence = "0%";
+            let capturedImageData = "";
 
-    scanHistory.unshift(logEntry);
-    localStorage.setItem('scanHistory', JSON.stringify(scanHistory));
-    
-    const accentColor = infoObj.risk === 'high' ? 'var(--danger)' : 'var(--success)';
-    
-    // Display result along with the captured picture preview
-    document.getElementById('result-display').innerHTML = `
-        <h3 style="color:${accentColor}; margin-top:0;">Assessment: ${topPrediction} (${confidence})</h3>
-        ${capturedImageData ? `<img src="${capturedImageData}" class="snapshot-preview" alt="Analyzed Target Snapshot">` : ''}
-        <p style="font-size:0.85rem; color:#666; margin: 5px 0 10px;">${userReportData}</p>
-        <div class="info-text"><b>Description:</b> ${infoObj.desc}</div>
-        <div class="info-text"><b>Guidance:</b> ${infoObj.adv}</div>
-        <div class="disclaimer-box">
-            ⚠️ <b>AI Limitation Notification:</b> This machine learning output serves as an educational, preliminary screening helper; it does not substitute for a professional clinical diagnosis.
-        </div>
-    `;
-    
-    document.getElementById('result-display').style.display = 'block';
-    updateHistoryUI();
- 
+            if (model && webcam) {
+                const prediction = await model.predict(webcam.canvas);
+                let highestProb = 0;
+                for (let i = 0; i < model.getTotalClasses(); i++) {
+                    if(prediction[i].probability > highestProb) {
+                        highestProb = prediction[i].probability;
+                        topPrediction = prediction[i].className;
+                        confidence = (highestProb * 100).toFixed(0) + "%";
+                    }
+                }
+
+                const snapCanvas = document.createElement('canvas');
+                snapCanvas.width = webcam.canvas.width;
+                snapCanvas.height = webcam.canvas.height;
+                const ctx = snapCanvas.getContext('2d');
+                ctx.drawImage(webcam.canvas, 0, 0, snapCanvas.width, snapCanvas.height);
+                capturedImageData = snapCanvas.toDataURL('image/png');
+            }
+
+            let infoObj = diagnosisDatabase[topPrediction] || {
+                desc: "The scanned visual target exhibits unique structural characteristics matching custom training dataset entries.",
+                adv: "Consult with a medical professional to review this specific visual structure formally.",
+                risk: "benign"
+            };
+
+            const logEntry = {
+                type: activeMode === 'moles' ? "Skin Mole" : "Mouth Lesion",
+                date: new Date().toLocaleDateString(),
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                notes: userReportData,
+                finding: `${topPrediction} (${confidence})`,
+                image: capturedImageData
+            };
+
+            scanHistory.unshift(logEntry);
+            localStorage.setItem('scanHistory', JSON.stringify(scanHistory));
+            
+            const accentColor = infoObj.risk === 'high' ? 'var(--danger)' : 'var(--success)';
+            
+            document.getElementById('result-display').innerHTML = `
+                <h3 style="color:${accentColor}; margin-top:0;">Assessment: ${topPrediction} (${confidence})</h3>
+                ${capturedImageData ? `<img src="${capturedImageData}" class="snapshot-preview" alt="Analyzed Target Snapshot">` : ''}
+                <p style="font-size:0.85rem; color:#666; margin: 5px 0 10px;">${userReportData}</p>
+                <div class="info-text"><b>Description:</b> ${infoObj.desc}</div>
+                <div class="info-text"><b>Guidance:</b> ${infoObj.adv}</div>
+                <div class="disclaimer-box">
+                    ⚠️ <b>AI Limitation Notification:</b> This machine learning output serves as an educational, preliminary screening helper; it does not substitute for a professional clinical diagnosis.
+                </div>
+            `;
+            
+            document.getElementById('result-display').style.display = 'block';
+            updateHistoryUI();
+        }
 
         function updateHistoryUI() {
-    const container = document.getElementById('history-log');
-    const targetType = activeMode === 'moles' ? "Skin Mole" : "Mouth Lesion";
-    const filtered = scanHistory.filter(h => h.type === targetType);
-    
-    if(filtered.length === 0) {
-        container.innerHTML = "No historical tracking snapshots saved for this category.";
-        return;
-    }
-    
-    container.innerHTML = filtered.map(entry => `
-        <div style="border-bottom:1px solid #ccc; padding: 8px 0; display: flex; align-items: center; gap: 10px;">
-            ${entry.image ? `<img src="${entry.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">` : ''}
-            <div>
-                📅 <b>${entry.date} at ${entry.time}</b><br>
-                ↳ Result: <span style="font-weight:bold;">${entry.finding}</span><br>
-                <small style="color:#666;">${entry.notes}</small>
-            </div>
-        </div>
-    `).join('');
-}
+            const container = document.getElementById('history-log');
+            const targetType = activeMode === 'moles' ? "Skin Mole" : "Mouth Lesion";
+            const filtered = scanHistory.filter(h => h.type === targetType);
+            
+            if(filtered.length === 0) {
+                container.innerHTML = "No historical tracking snapshots saved for this category.";
+                return;
+            }
+            
+            container.innerHTML = filtered.map(entry => `
+                <div style="border-bottom:1px solid #ccc; padding: 8px 0; display: flex; align-items: center; gap: 10px;">
+                    ${entry.image ? `<img src="${entry.image}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">` : ''}
+                    <div>
+                        📅 <b>${entry.date} at ${entry.time}</b><br>
+                        ↳ Result: <span style="font-weight:bold;">${entry.finding}</span><br>
+                        <small style="color:#666;">${entry.notes}</small>
+                    </div>
+                </div>
+            `).join('');
+        }
 
         async function stopAndBack() {
             if (webcam) {
@@ -493,4 +494,6 @@
             changeScreen('menu-screen');
         }
     </script>
+</body>
+</html>
         
